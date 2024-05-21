@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Автоматизация{% endblock %}
+
+{% block content %}
+
+<main class="container">
+      <div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
+        <div class="col-md-6 px-0">
+          <h1 class="display-4 fst-italic">Расчёт одноконтурной АСР</h1>
+          <p class="lead my-3">Методы идентификации линейного объекта при помощи методов Ольденбурга-Сарториуса, Симою. Рассчитывание ПИД-регулятора с помощью метода расширенных частотных характеристик.</p>
+          <p class="lead mb-0"><a href="#" class="text-white fw-bold">Начать...</a></p>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+              <h5 class="mb-0">Получение приближенных математических моделей графоаналитическим методом.</h5>
+              <br>
+              <p class="card-text mb-auto">Получение передаточной функции и рассчёт оптимальных настроечных параметров ПИ-регулятора.</p>
+              <a href="#" class="stretched-link">Начать...</a>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+              <img src="{{ url_for('static', filename='img/getting_math_models.jpg') }}" class="blurbackgroundpersonal" alt="Cascade" width="200" height="250">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+            <div class="col p-4 d-flex flex-column position-static">
+              <h3 class="mb-0">Расчёт комбинированной системы автоматического регулирования.</h3>
+              <br>
+              <a href="#" class="stretched-link">Начать...</a>
+            </div>
+            <div class="col-auto d-none d-lg-block">
+              <img src="{{ url_for('static', filename='img/cascade.jpg') }}" class="blurbackgroundpersonal" alt="Cascade" width="200" height="250">
+            </div>
+          </div>
+        </div>
+      </div>
+</main>
+
+{% endblock %}
