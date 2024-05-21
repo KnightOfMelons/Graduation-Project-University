@@ -1,3 +1,7 @@
 .blurbackgroundpersonal {
     filter: blur(1.5px);
-};
+}
+
+.input-field-for-PID {
+    width: 3.2rem;
+}
