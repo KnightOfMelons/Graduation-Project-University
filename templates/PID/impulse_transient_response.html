@@ -125,7 +125,30 @@
 
             <br>
 
-            <div class="text-center mb-3">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">τимп:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="tau" value="35" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">Xвх. имп:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="x_values_imp" value="25" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">at:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="at" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">aθ:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="a_theta" value="1.0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">М:</label>
+                    <input type="text" class="form-control input-field-for-PID" style="width: 3.5rem;" name="M" value="1.55" required>
+                </div>
+            </div>
+
+            <div class="text-center mb-3 my-2">
                 <input type="submit" class="btn btn-primary" value="Построить график">
             </div>
         </form>
@@ -133,6 +156,27 @@
         {% if image %}
         <div class="d-flex justify-content-center my-4">
             {{ image | safe }}
+        </div>
+        {% endif %}
+
+        {% if numbers %}
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="math-expression">
+                        <h5 class="mb-0">T<span class="subscript">a</span> = F<span class="subscript">λ</span> / σ<span class="subscript">(макс.имп)</span> = {{ numbers[9] }} / {{ numbers[8] }} = {{ numbers[5] }}</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-0">k = F<span class="subscript">σ</span> / F<span class="subscript">λ</span> =
+                            {{ numbers[10] }} / {{ numbers[9] }} = {{ numbers[6] }}</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-3">τ = {{ numbers[7] }}</h5>
+                    </div>
+                </div>
+            </div>
         </div>
         {% endif %}
 
