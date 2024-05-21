@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request  # send_file
+from flask import Flask, render_template, request
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -14,7 +14,6 @@ def main_page():
 @app.route("/impulse_transient_response", methods=["GET", "POST"])
 def plot_impulse_transient_response():
     if request.method == "POST":
-        # Получение данных из формы
         x_values = [float(request.form[f"xValues_{i}"]) for i in range(17)]
         y_values = [float(request.form[f"yValues_{i}"]) for i in range(17)]
 
@@ -34,9 +33,8 @@ def plot_impulse_transient_response():
             for index, value in enumerate(y_values):
                 if value > 0:
                     return x_values[index]
-            return None  # Если в y_values нет значений больше нуля
+            return None
 
-        # Получение данных из формы 2
         tau = float(request.form["tau"])
         x_values_imp = float(request.form["x_values_imp"])
         at = float(request.form["at"])
