@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request  # send_file
 import matplotlib.pyplot as plt
+import io
 import base64
-from io import BytesIO
 
 app = Flask(__name__)
 
@@ -11,27 +11,38 @@ def main_page():
     return render_template('index.html')
 
 
-@app.route("/plot_impulse_transient_response", methods=['GET', 'POST'])
-def impulse_transient_response():
-    pass
-    # if request.method == 'POST':
-    #     x_values = [request.form[f'xValues_{i}'] for i in range(17)]
-    #     y_values = [request.form[f'yValues_{i}'] for i in range(17)]
-    #     plt.figure(figsize=(8, 4))
-    #     plt.plot(x_values, y_values)
-    #     plt.title('График')
-    #     plt.xlabel('X')
-    #     plt.ylabel('Y')
-    #     plt.grid(True)
-    #     buffer = BytesIO()
-    #     plt.savefig(buffer, format='png')
-    #     buffer.seek(0)
-    #     image_png = buffer.getvalue()
-    #     graph = base64.b64encode(image_png)
-    #     graph = graph.decode('utf-8')
-    #     buffer.close()
-    #     return render_template('PID/PID.html', graph=graph)
-    # return render_template('PID/PID.html')
+@app.route("/impulse_transient_response", methods=["GET", "POST"])
+def plot_impulse_transient_response():
+    if request.method == "POST":
+        # Получение данных из формы
+        x_values = [float(request.form[f"xValues_{i}"]) for i in range(17)]
+        y_values = [float(request.form[f"yValues_{i}"]) for i in range(17)]
+
+        # Создаем новую фигуру и оси
+        fig, ax = plt.subplots()
+
+        # Строим график
+        ax.plot(x_values, y_values, marker='o')
+        plt.xlabel('T')
+        plt.ylabel('Ø')
+        plt.title('Импульсная переходная характеристика')
+        plt.grid(True)
+
+        # Сохраняем график в буфер
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+
+        # Кодируем буфер в base64 строку
+        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+        # Генерируем HTML-код для отображения картинки
+        image = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+        # Выводим HTML-код на сайт
+        return render_template('PID/impulse_transient_response.html', image=image)
+
+    return render_template("PID/impulse_transient_response.html")
 
 
 app.run(debug=True)
