@@ -47,9 +47,6 @@ def plot_impulse_transient_response():
         Fo = calculate_total_area(x_values, y_values)
         k = round(Fo / Fl, 1)
         t = find_first_positive_index(y_values, x_values)
-        # Yvih_value = float(request.form["Yvih_value"])
-        # Xvhod_imp = float(request.form["Xvhod_imp"])
-        # K = round(Yvih_value / Xvhod_imp, 2)
 
         # Создаем новую фигуру и оси
         fig, ax = plt.subplots()
@@ -106,7 +103,8 @@ def plot_impulse_transient_response():
         image_acceleration_charact, z_values = acceleration_characteristic(x_values, y_values)
 
         # Выводим HTML-код на сайт
-        return render_template('PID/PID_full_page.html', image_impulse=image_impulse,
+        return render_template('PID/PID_full_page.html',
+                               image_impulse=image_impulse,
                                numbers=[tau, x_values_imp, at, a_theta, M, Ta, k, t, o, Fl, Fo],
                                image_acceleration_charact=image_acceleration_charact)
 
