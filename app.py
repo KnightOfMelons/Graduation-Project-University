@@ -11,7 +11,7 @@ def main_page():
     return render_template('index.html')
 
 
-@app.route("/impulse_transient_response", methods=["GET", "POST"])
+@app.route("/PID", methods=["GET", "POST"])
 def plot_impulse_transient_response():
     if request.method == "POST":
         x_values = [float(request.form[f"xValues_{i}"]) for i in range(17)]
@@ -67,13 +67,47 @@ def plot_impulse_transient_response():
         image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
 
         # Генерируем HTML-код для отображения картинки
-        image = '<img src="data:image/png;base64,{}">'.format(image_base64)
+        image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+        def acceleration_characteristic(x_values, y_values):
+            z_values = []
+            cumulative_sum = 0
+            for y in y_values:
+                cumulative_sum += y
+                z_values.append(cumulative_sum)
+
+            # Создаем новую фигуру и оси
+            fig, ax = plt.subplots()
+
+            # Строим график
+            ax.plot(x_values, z_values, marker='o')
+            plt.xlabel('T')
+            plt.ylabel('Ø')
+            plt.title('Разгонная характеристика объекта')
+            plt.grid(True)
+
+            # Сохраняем график в буфер
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png')
+            buf.seek(0)
+
+            # Кодируем буфер в base64 строку
+            image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+            # Генерируем HTML-код для отображения картинки
+            image_acceleration_charact = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+            # Возвращаем HTML-код и данные
+            return image_acceleration_charact, z_values
+
+        image_acceleration_charact, z_values = acceleration_characteristic(x_values, y_values)
 
         # Выводим HTML-код на сайт
-        return render_template('PID/impulse_transient_response.html', image=image,
-                               numbers=[tau, x_values_imp, at, a_theta, M, Ta, k, t, o, Fl, Fo])
+        return render_template('PID/PID_full_page.html', image_impulse=image_impulse,
+                               numbers=[tau, x_values_imp, at, a_theta, M, Ta, k, t, o, Fl, Fo],
+                               image_acceleration_charact=image_acceleration_charact)
 
-    return render_template("PID/impulse_transient_response.html")
+    return render_template("PID/PID_full_page.html")
 
 
 app.run(debug=True)
