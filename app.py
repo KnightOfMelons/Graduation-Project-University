@@ -47,6 +47,9 @@ def plot_impulse_transient_response():
         Fo = calculate_total_area(x_values, y_values)
         k = round(Fo / Fl, 1)
         t = find_first_positive_index(y_values, x_values)
+        # Yvih_value = float(request.form["Yvih_value"])
+        # Xvhod_imp = float(request.form["Xvhod_imp"])
+        # K = round(Yvih_value / Xvhod_imp, 2)
 
         # Создаем новую фигуру и оси
         fig, ax = plt.subplots()
