@@ -64,6 +64,7 @@ def simou_method(y, t, input_K=1):
 @app.route("/PID", methods=["GET", "POST"])
 def plot_impulse_transient_response():
     if request.method == "POST":
+        # ==== Беру значения с сайта ====
         x_values = [float(request.form[f"xValues_{i}"]) for i in range(17)]
         y_values = [float(request.form[f"yValues_{i}"]) for i in range(17)]
 
@@ -90,6 +91,7 @@ def plot_impulse_transient_response():
         at = float(request.form["at"])
         a_theta = float(request.form["a_theta"])
         M = float(request.form["M"])
+        input_K_from_input = int(request.form["input_signal"])
 
         Fl = (tau * at)
         o = max(y_values)
@@ -98,6 +100,7 @@ def plot_impulse_transient_response():
         k = round(Fo / Fl, 1)
         t = find_first_positive_index(y_values, x_values)
 
+        # ==== Тут создается импульсная переходная характеристика ====
         # Создаем новую фигуру и оси
         fig, ax = plt.subplots()
 
@@ -119,6 +122,7 @@ def plot_impulse_transient_response():
         # Генерируем HTML-код для отображения картинки
         image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+        # ==== Разгонная характеристика ====
         def acceleration_characteristic(x_values, y_values):
             z_values = []
             cumulative_sum = 0
@@ -152,11 +156,54 @@ def plot_impulse_transient_response():
 
         image_acceleration_charact, z_values = acceleration_characteristic(x_values, y_values)
 
+        # ==== Метод Симою ====
+        # Тут я пытаюсь найти первый положительный индекс в z_values - 1,
+        # чтобы с нулём было в начале (если у нас 0 0 0 1 3 8, то он найдет 1, но мне также нужен ноль перед этим)
+        first_positive_index = next((index for index, value in enumerate(z_values) if value > 0), None) - 1
+        # Тут я делаю новый список со значениями по индексу, который нашел сверху
+        z_values_for_simou = z_values[first_positive_index:]
+        # убираю ненужную часть (в конце там 104 105 105, вторая 105 не нужна)
+        z_values_for_simou = z_values_for_simou[:-1]
+        t1, t2, t3, input_K, extended_y, response_1st, response_2nd, response_3rd = simou_method(
+            np.array(z_values_for_simou),
+            np.array(x_values[:len(z_values_for_simou)]),
+            input_K_from_input)
+
+        # Создаем график
+        plt.figure(figsize=(8, 4))
+        plt.plot(np.linspace(0, 260, 500), extended_y, 'r', label='Исходная кривая')
+        plt.plot(np.linspace(0, 260, 500), response_1st, 'g--', label='Симою 1го порядка')
+        plt.plot(np.linspace(0, 260, 500), response_2nd, 'b--', label='Симою 2го порядка')
+        plt.plot(np.linspace(0, 260, 500), response_3rd, 'k--', label='Симою 3го порядка')
+
+        plt.xlabel('Время')
+        plt.ylabel('Переменная')
+        plt.title('Метод Симою')
+        plt.legend()
+        plt.grid(True, which='both', linestyle='--', linewidth=0.5)
+        plt.xticks(np.arange(0, max(x_values) + 1, 20))
+        plt.yticks(np.arange(0, max(y_values) + 1, 10))
+        plt.minorticks_on()
+        plt.grid(which='minor', linestyle=':', linewidth=0.5)
+
+        # Сохраняем график в буфер
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+
+        # Кодируем буфер в base64 строку
+        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+        # Генерируем HTML-код для отображения картинки
+        image_simou = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
         # Выводим HTML-код на сайт
         return render_template('PID/PID_full_page.html',
                                image_impulse=image_impulse,
                                numbers=[tau, x_values_imp, at, a_theta, M, Ta, k, t, o, Fl, Fo],
-                               image_acceleration_charact=image_acceleration_charact)
+                               image_acceleration_charact=image_acceleration_charact,
+                               numbers_simou=[round(t1, 2), round(t2, 2), round(t3, 2), round(input_K, 1)],
+                               image_simou=image_simou)
 
     return render_template("PID/PID_full_page.html")
 
@@ -168,8 +215,8 @@ def method_simou():
         y_values = np.array([float(request.form[f"yValues_{i}"]) for i in range(14)])
         input_K = int(request.form['input_signal'])
 
-        t1, t2, t3, input_K, extended_y, response_1st, response_2nd, response_3rd = simou_method(y_values, x_values, input_K)
-
+        t1, t2, t3, input_K, extended_y, response_1st, response_2nd, response_3rd = simou_method(y_values, x_values,
+                                                                                                 input_K)
         # Создаем график
         plt.figure(figsize=(8, 4))
         plt.plot(np.linspace(0, 260, 500), extended_y, 'r', label='Исходная кривая')
@@ -203,5 +250,6 @@ def method_simou():
                                numbers=[round(t1, 2), round(t2, 2), round(t3, 2), round(input_K, 1)])
 
     return render_template('simou_methods.html')
+
 
 app.run(debug=True)
