@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Симою{% endblock %}
+
+{% block content %}
+
+<main class="container">
+    <h4 class="text-center mb-4">Определение передаточной функции объекта по переходной кривой методом Симою</h4>
+
+    <form action="/SIMOU" method="POST">
+        <div class="col-auto my-2">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">t:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_0" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_1" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_2" value="40" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_3" value="60" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_4" value="80" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_5" value="100" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_6" value="120" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_7" value="140" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_8" value="160" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_9" value="180" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_10" value="200" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_11" value="220" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_12" value="240" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-SIMOU" name="xValues_13" value="260" required>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="row justify-content-center">
+                    <div class="col-auto my-2">
+                        <label class="form-label">y(t):</label>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_0" value="0" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_1" value="1" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_2" value="3" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_3" value="8" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_4" value="18" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_5" value="30" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_6" value="44" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_7" value="59" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_8" value="73" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_9" value="85" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_10" value="95" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_11" value="101" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_12" value="104" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-SIMOU" name="yValues_13" value="105" required>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-1 my-2">
+                        <label class="form-label">Входной сигнал:</label>
+                        <input type="text" class="form-control input-field-for-SIMOU" name="input_signal" value="30" required>
+                    </div>
+                </div>
+
+                <div class="text-center my-2">
+                    <input type="submit" class="btn btn-primary" value="Рассчитать">
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <hr class="my-4">
+
+    {% if image_html %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_html | safe }}
+        </div>
+
+        <div class="col-auto my-2">
+            <h5 class="text-center mb-4">Коэффициент услиения: {{ numbers[3] }}</h5>
+            <h5 class="text-center mb-4">a[0]: 1</h5>
+            <h5 class="text-center mb-4">a[1]: {{ numbers[0] }}</h5>
+            <h5 class="text-center mb-4">a[2]: {{ numbers[1] }}</h5>
+            <h5 class="text-center mb-4">a[2]: {{ numbers[2] }}</h5>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <h5 style="color:green">Симою 1го порядка</h5>
+            </div>
+            <div class="col-auto text-center">
+                <p class="mb-4 mt-4">
+                    W(s) = {{ numbers[3] }}
+                </p>
+            </div>
+            <div class="col-auto text-center">
+                <div>1</div>
+                <div class="mb-2"><hr></div>
+                <div>{{ numbers[0] }}*s + 1</div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-2">
+            <div class="col-12 text-center">
+                <h5 style="color:blue">Симою 2го порядка</h5>
+            </div>
+            <div class="col-auto text-center">
+                <div class="mb-4 mt-4">
+                    W(s) = {{ numbers[3] }}
+                </div>
+            </div>
+            <div class="col-auto text-center">
+                <div>1</div>
+                <div class="mb-2"><hr></div>
+                <div>{{ numbers[1] }}*s^2 + {{ numbers[0] }}*s + 1</div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-2">
+            <div class="col-12 text-center">
+                <h5>Симою 3го порядка</h5>
+            </div>
+            <div class="col-auto text-center">
+                <div class="mb-4 mt-4">
+                    W(s) = {{ numbers[3] }}
+                </div>
+            </div>
+            <div class="col-auto text-center">
+                <div>1</div>
+                <div class="mb-2"><hr></div>
+                <div>{{ numbers[2] }}*s^3 + {{ numbers[1] }}*s^2 + {{ numbers[0] }}*s + 1</div>
+            </div>
+        </div>
+    {% endif %}
+
+</main>
+{% endblock %}

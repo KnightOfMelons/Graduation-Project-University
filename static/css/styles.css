@@ -2,6 +2,6 @@
     filter: blur(1.5px);
 }
 
-.input-field-for-PID {
+.input-field-for-PID, .input-field-for-SIMOU {
     width: 3.2rem;
 }
