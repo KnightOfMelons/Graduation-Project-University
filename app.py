@@ -23,12 +23,16 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
                                                    t1_simou=131.71,
                                                    t2_simou=7436.27,
                                                    k=3.5):
+    def find_values_at_points(t, y, x_points):
+        y_values = np.interp(x_points, t, y)
+        return y_values
+
     # Define the transfer functions
-    G1 = ctl.TransferFunction([1], [t1_kos, 1])
-    G2 = ctl.TransferFunction([1], [t2_kos, 1])
-    G3 = ctl.TransferFunction([1], [t1_aldenb, 1])
-    G4 = ctl.TransferFunction([1], [t2_aldenb, 1])
-    G5 = ctl.TransferFunction([1], [t2_simou, t1_simou, 1])
+    G1 = ctl.TransferFunction([1], [int(t1_kos), 1])
+    G2 = ctl.TransferFunction([1], [int(t2_kos), 1])
+    G3 = ctl.TransferFunction([1], [int(t1_aldenb), 1])
+    G4 = ctl.TransferFunction([1], [int(t2_aldenb), 1])
+    G5 = ctl.TransferFunction([1], [int(t2_simou), int(t1_simou), 1])
 
     # Connect the blocks
     sys1 = k * G1 * G2
@@ -46,6 +50,14 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
     t1, y1 = ctl.forced_response(sys1, T=t, U=step_input)
     t2, y2 = ctl.forced_response(sys2, T=t, U=step_input)
     t3, y3 = ctl.forced_response(sys3, T=t, U=step_input)
+
+    # Define the points where we want to find the values
+    x_points = [0, 60, 120, 180, 320]
+
+    # Find values at the specified points
+    y1_values = find_values_at_points(t1, y1, x_points)
+    y2_values = find_values_at_points(t2, y2, x_points)
+    y3_values = find_values_at_points(t3, y3, x_points)
 
     # Plot the results
     fig, ax = plt.subplots()
@@ -67,7 +79,7 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
     # Генерируем HTML-код для отображения картинки
     image_result = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
-    return image_result
+    return image_result, y1_values, y2_values, y3_values
 
 
 # Функция для вычисления трёх методов Симою
@@ -226,8 +238,8 @@ def impulse_transient_plot(x_values, y_values):
     return image_impulse
 
 
-@app.route("/PID", methods=["GET", "POST"])
-def function_of_main_pid_page():
+@app.route("/PID_part_1", methods=["GET", "POST"])
+def function_of_main_pid_page_first():
     if request.method == "POST":
         # ===== Беру значения с сайта =====
         x_values = [float(request.form[f"xValues_{i}"]) for i in range(17)]
@@ -272,25 +284,46 @@ def function_of_main_pid_page():
             np.array(x_values[:len(z_values_for_simou)]),
             input_K_from_input)
 
-        # ======================== Передаточные фукнции, определенные тремя методами ===================================
-        image_three_methods = transfer_functions_determined_by_three_methods(t1_kos=40,
-                                                                             t2_kos=240,
-                                                                             t1_aldenb=199,
-                                                                             t2_aldenb=168,
-                                                                             t1_simou=t1,
-                                                                             t2_simou=t2,
-                                                                             k=input_K)
-
         # ======================================= ОБЩИЙ ВЫВОД НА САЙТ =================================================
-        return render_template('PID/PID_full_page.html',
+        return render_template('PID/PID_full_page_1.html',
                                image_impulse=image_impulse,
                                numbers=[tau, x_values_imp, at, a_theta, M, Ta, k, t, o, Fl, Fo],
                                image_acceleration_charact=image_acceleration_charact,
                                numbers_simou=[round(t1, 2), round(t2, 2), round(t3, 2), round(input_K, 1)],
-                               image_simou=image_simou,
-                               image_three_methods=image_three_methods)
+                               image_simou=image_simou)
 
-    return render_template("PID/PID_full_page.html")
+    return render_template("PID/PID_full_page_1.html")
+
+
+@app.route("/PID_part_2", methods=["GET", "POST"])
+def function_of_main_pid_second():
+    if request.method == "POST":
+        # ======================== Передаточные фукнции, определенные тремя методами ===================================
+        t1_kos = int(request.form['t1_kos'])
+        t2_kos = int(request.form['t2_kos'])
+        t1_aldenb = int(request.form['t1_aldenb'])
+        t2_aldenb = int(request.form['t2_aldenb'])
+        t1_simou = float(request.form['t1_simou'])
+        t2_simou = float(request.form['t2_simou'])
+        k = float(request.form['k'])
+
+        image_three_methods, y1_values, y2_values, y3_values = transfer_functions_determined_by_three_methods(t1_kos,
+                                                                             t2_kos,
+                                                                             t1_aldenb,
+                                                                             t2_aldenb,
+                                                                             t1_simou,
+                                                                             t2_simou,
+                                                                             k)
+
+        y1_values = [round(y, 4) for y in y1_values]
+        y2_values = [round(y, 4) for y in y2_values]
+        y3_values = [round(y, 4) for y in y3_values]
+
+        return render_template('PID/PID_full_page_2.html',
+                               image_three_methods=image_three_methods,
+                               y_values=[y1_values, y2_values, y3_values],
+                               x_points=[0, 60, 120, 180, 320])
+    return render_template("PID/PID_full_page_2.html")
 
 
 @app.route('/SIMOU', methods=["GET", "POST"])
