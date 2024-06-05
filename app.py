@@ -22,16 +22,21 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
                                                    t2_aldenb=166,
                                                    t1_simou=131.71,
                                                    t2_simou=7436.27,
-                                                   k=3.5):
+                                                   k=3.5,
+                                                   stop_time=2500,
+                                                   y_values=None):
+    if y_values is None:
+        y_values = [0, 1, 3, 8, 18, 30, 44, 59, 73, 85, 95, 101, 104, 105, 105]
+
     def find_values_at_points(t, y, x_points):
         y_values = np.interp(x_points, t, y)
         return y_values
 
     # Define the transfer functions
-    G1 = ctl.TransferFunction([1], [int(t1_kos), 1])
-    G2 = ctl.TransferFunction([1], [int(t2_kos), 1])
-    G3 = ctl.TransferFunction([1], [int(t1_aldenb), 1])
-    G4 = ctl.TransferFunction([1], [int(t2_aldenb), 1])
+    G1 = ctl.TransferFunction([1], [int(t1_kos / 5), 1])
+    G2 = ctl.TransferFunction([1], [int(t2_kos / 5), 1])
+    G3 = ctl.TransferFunction([1], [int(t1_aldenb / 5), 1])
+    G4 = ctl.TransferFunction([1], [int(t2_aldenb / 5), 1])
     G5 = ctl.TransferFunction([1], [int(t2_simou), int(t1_simou), 1])
 
     # Connect the blocks
@@ -40,7 +45,7 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
     sys3 = k * G5
 
     # Define the time vector
-    t = np.linspace(0, 2500, num=5000)
+    t = np.linspace(0, stop_time, num=5000)
 
     # Define the step input with time delay
     step_input = np.zeros_like(t)
@@ -51,13 +56,33 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
     t2, y2 = ctl.forced_response(sys2, T=t, U=step_input)
     t3, y3 = ctl.forced_response(sys3, T=t, U=step_input)
 
-    # Define the points where we want to find the values
-    x_points = [0, 60, 120, 180, 320]
+    # Define the points where we want to find the first values
+    x_points = [0, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320]
 
     # Find values at the specified points
     y1_values = find_values_at_points(t1, y1, x_points)
     y2_values = find_values_at_points(t2, y2, x_points)
     y3_values = find_values_at_points(t3, y3, x_points)
+
+    # Calculate the sum of squared differences (dispersion) for each method
+    dispersion_y1 = sum((yv - y1v) ** 2 for yv, y1v in zip(y_values, y1_values))
+    dispersion_y2 = sum((yv - y2v) ** 2 for yv, y2v in zip(y_values, y2_values))
+    dispersion_y3 = sum((yv - y3v) ** 2 for yv, y3v in zip(y_values, y3_values))
+
+    answer_1_kasatelnaia = 'метода касательной.'
+    answer_2_oldenburg_sartorius = 'метода Ольденбурга-Сарториуса.'
+    answer_3_simou = 'метода Симою.'
+
+    # Determine which dispersion is the largest
+    if dispersion_y1 < dispersion_y2 and dispersion_y1 < dispersion_y3:
+        chosen_answer = answer_1_kasatelnaia
+        nums_for_answer = [t1_kos, t2_kos]
+    elif dispersion_y2 < dispersion_y1 and dispersion_y2 < dispersion_y3:
+        chosen_answer = answer_2_oldenburg_sartorius
+        nums_for_answer = [t1_aldenb, t2_aldenb]
+    else:
+        chosen_answer = answer_3_simou
+        nums_for_answer = [t1_simou, t2_simou]
 
     # Plot the results
     fig, ax = plt.subplots()
@@ -79,7 +104,7 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
     # Генерируем HTML-код для отображения картинки
     image_result = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
-    return image_result, y1_values, y2_values, y3_values
+    return image_result, y1_values, y2_values, y3_values, dispersion_y1, dispersion_y2, dispersion_y3, chosen_answer, nums_for_answer
 
 
 # Функция для вычисления трёх методов Симою
@@ -306,15 +331,29 @@ def function_of_main_pid_second():
         t1_simou = float(request.form['t1_simou'])
         t2_simou = float(request.form['t2_simou'])
         k = float(request.form['k'])
+        stop_time = int(request.form['stop_time'])
+        y_values = [float(request.form[f"yValues_{i}"]) for i in range(15)]
 
-        image_three_methods, y1_values, y2_values, y3_values = transfer_functions_determined_by_three_methods(t1_kos,
-                                                                             t2_kos,
-                                                                             t1_aldenb,
-                                                                             t2_aldenb,
-                                                                             t1_simou,
-                                                                             t2_simou,
-                                                                             k)
+        (image_three_methods,
+         y1_values,
+         y2_values,
+         y3_values,
+         dispersion_y1,
+         dispersion_y2,
+         dispersion_y3,
+         answer,
+         answer_nums) = transfer_functions_determined_by_three_methods(
+            t1_kos,
+            t2_kos,
+            t1_aldenb,
+            t2_aldenb,
+            t1_simou,
+            t2_simou,
+            k,
+            stop_time,
+            y_values, )
 
+        # Вычисляю данные для 0, 60, 120, 180, 320 по каждому методу на графике.
         y1_values = [round(y, 4) for y in y1_values]
         y2_values = [round(y, 4) for y in y2_values]
         y3_values = [round(y, 4) for y in y3_values]
@@ -322,7 +361,10 @@ def function_of_main_pid_second():
         return render_template('PID/PID_full_page_2.html',
                                image_three_methods=image_three_methods,
                                y_values=[y1_values, y2_values, y3_values],
-                               x_points=[0, 60, 120, 180, 320])
+                               dispersions=[dispersion_y1, dispersion_y2, dispersion_y3],
+                               x_points=[0, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320],
+                               answer=answer,
+                               answer_nums=answer_nums)
     return render_template("PID/PID_full_page_2.html")
 
 
