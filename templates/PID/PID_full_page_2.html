@@ -3,208 +3,214 @@
 {% block title %}Одноконтурная АСР ч.2{% endblock %}
 
 {% block content%}
-<div class="container">
-    <h1 class="text-center mb-4">Введите данные с прошлой страницы:</h1>
-    <form action="/PID_part_2" method="POST">
-        <div class="row justify-content-center">
-            <div class="col-auto my-2">
-                <label class="form-label">T1 косательной:</label>
-                <input type="text" class="form-control input-field-for-PID" name="t1_kos" value="40" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">T2 косательной:</label>
-                <input type="text" class="form-control input-field-for-PID" name="t2_kos" value="240" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">T1 Альденбурга-Сарториуса:</label>
-                <input type="text" class="form-control input-field-for-PID" name="t1_aldenb" value="199" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">T2 Альденбурга-Сарториуса:</label>
-                <input type="text" class="form-control input-field-for-PID" name="t2_aldenb" value="166" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">T1 метода Симою:</label>
-                <input type="text" class="form-control input-field-for-PID" name="t1_simou" style="width: 5rem;" value="131.71" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">T2 метода Симою:</label>
-                <input type="text" class="form-control input-field-for-PID" name="t2_simou" style="width: 5rem;" value="7436.27" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">Коэффициент усиления:</label>
-                <input type="text" class="form-control input-field-for-PID" name="k" value="3.5" required>
-            </div>
-
-            <div class="col-auto my-2">
-                <label class="form-label">Stop time:</label>
-                <input type="text" class="form-control input-field-for-PID" name="stop_time" style="width: 3.5rem;" value="600" required>
-            </div>
-
-            <hr class="my-4">
-
-            <h5 class="text-center mb-4">Ø разгонной характеристики:</h5>
-
+    <div class="container">
+        <h1 class="text-center mb-4">Введите данные с прошлой страницы:</h1>
+        <form action="/PID_part_2" method="POST">
             <div class="row justify-content-center">
                 <div class="col-auto my-2">
-                    <label class="form-label">Ø:</label>
+                    <label class="form-label">T1 косательной:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_kos" value="40" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_0" value="0" required>
+                    <label class="form-label">T2 косательной:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t2_kos" value="240" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_1" value="1" required>
+                    <label class="form-label">T1 Альденбурга-Сарториуса:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_aldenb" value="199" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_2" value="3" required>
+                    <label class="form-label">T2 Альденбурга-Сарториуса:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t2_aldenb" value="166" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_3" value="8" required>
+                    <label class="form-label">T1 метода Симою:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_simou" style="width: 5rem;" value="131.71" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_4" value="18" required>
+                    <label class="form-label">T2 метода Симою:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t2_simou" style="width: 5rem;" value="7436.27" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_5" value="30" required>
+                    <label class="form-label">Коэффициент усиления:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="k" value="3.5" required>
                 </div>
+
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_6" value="44" required>
+                    <label class="form-label">Stop time:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="stop_time" style="width: 3.5rem;" value="600" required>
                 </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_7" value="59" required>
+
+                <hr class="my-4">
+
+                <h5 class="text-center mb-4">Ø разгонной характеристики:</h5>
+
+                <div class="row justify-content-center">
+                    <div class="col-auto my-2">
+                        <label class="form-label">Ø:</label>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_0" value="0" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_1" value="1" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_2" value="3" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_3" value="8" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_4" value="18" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_5" value="30" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_6" value="44" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_7" value="59" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_8" value="73" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_9" value="85" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_10" value="95" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_11" value="101" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_12" value="104" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_13" value="105" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_14" value="105" required>
+                    </div>
                 </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_8" value="73" required>
-                </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_9" value="85" required>
-                </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_10" value="95" required>
-                </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_11" value="101" required>
-                </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_12" value="104" required>
-                </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_13" value="105" required>
-                </div>
-                <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID-2" name="yValues_14" value="105" required>
+
+                <div class="text-center my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить">
                 </div>
             </div>
+        </form>
 
-            <div class="text-center my-2">
-                <input type="submit" class="btn btn-primary" value="Построить">
-            </div>
-        </div>
-    </form>
-
-    {% if image_three_methods %}
-    <div class="d-flex justify-content-center my-4">
-        {{ image_three_methods | safe}}
-    </div>
-
-    <div class="d-flex justify-content-center my-4">
-        <p>Для оценки идентичности исходного переходного процесса к найденным определим значение дисперсии для всех троих случаев.</p>
-    </div>
-
-    <div class="d-flex justify-content-center my-4">
-        <div class="col-md-12">
-            <h5 class="text-center">Таблица данных, определённых методом касательной:</h5>
-            <table class="table table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>T</th>
-                        {% for x in x_points %}
-                        <th>{{ x }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>O</th>
-                        {% for y in y_values[0] %}
-                        <td>{{ y }}</td>
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="d-flex align-items-center justify-content-center my-3">
-                <img src="{{ url_for('static', filename='img/dispercia.jpg') }}" class="img-fluid" style="width: 30%;" alt="Переходные характеристики">
-                <span class="ms-3 fw-bold">{{ dispersions[0] | int }}</span>
-            </div>
-
-            <h5 class="text-center">Таблица данных, определённых методом Ольденбурга-Сарториуса:</h5>
-            <table class="table table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>T</th>
-                        {% for x in x_points %}
-                        <th>{{ x }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>O</th>
-                        {% for y in y_values[1] %}
-                        <td>{{ y }}</td>
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="d-flex align-items-center justify-content-center my-3">
-                <img src="{{ url_for('static', filename='img/dispercia.jpg') }}" class="img-fluid" style="width: 30%;" alt="Переходные характеристики">
-                <span class="ms-3 fw-bold">{{ dispersions[1] | int }}</span>
-            </div>
-
-            <h5 class="text-center">Таблица данных, определённых методом Симою:</h5>
-            <table class="table table-bordered text-center">
-                <thead>
-                    <tr>
-                        <th>T</th>
-                        {% for x in x_points %}
-                        <th>{{ x }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>O</th>
-                        {% for y in y_values[2] %}
-                        <td>{{ y }}</td>
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="d-flex align-items-center justify-content-center my-3">
-                <img src="{{ url_for('static', filename='img/dispercia.jpg') }}" class="img-fluid" style="width: 30%;" alt="Переходные характеристики">
-                <span class="ms-3 fw-bold">{{ dispersions[2] | int }}</span>
-            </div>
+        {% if image_three_methods %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_three_methods | safe}}
         </div>
 
+        <div class="d-flex justify-content-center my-4">
+            <p>Для оценки идентичности исходного переходного процесса к найденным определим значение дисперсии для всех троих случаев.</p>
+        </div>
+
+        <div class="d-flex justify-content-center my-4">
+            <div class="col-md-12">
+                <h5 class="text-center">Таблица данных, определённых методом касательной:</h5>
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>T</th>
+                            {% for x in x_points %}
+                            <th>{{ x }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>O</th>
+                            {% for y in y_values[0] %}
+                            <td>{{ y }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex align-items-center justify-content-center my-3">
+                    <img src="{{ url_for('static', filename='img/dispercia.jpg') }}" class="img-fluid" style="width: 30%;" alt="Переходные характеристики">
+                    <span class="ms-3 fw-bold">{{ dispersions[0] | int }}</span>
+                </div>
+
+                <h5 class="text-center">Таблица данных, определённых методом Ольденбурга-Сарториуса:</h5>
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>T</th>
+                            {% for x in x_points %}
+                            <th>{{ x }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>O</th>
+                            {% for y in y_values[1] %}
+                            <td>{{ y }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex align-items-center justify-content-center my-3">
+                    <img src="{{ url_for('static', filename='img/dispercia.jpg') }}" class="img-fluid" style="width: 30%;" alt="Переходные характеристики">
+                    <span class="ms-3 fw-bold">{{ dispersions[1] | int }}</span>
+                </div>
+
+                <h5 class="text-center">Таблица данных, определённых методом Симою:</h5>
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>T</th>
+                            {% for x in x_points %}
+                            <th>{{ x }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>O</th>
+                            {% for y in y_values[2] %}
+                            <td>{{ y }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="d-flex align-items-center justify-content-center my-3">
+                    <img src="{{ url_for('static', filename='img/dispercia.jpg') }}" class="img-fluid" style="width: 30%;" alt="Переходные характеристики">
+                    <span class="ms-3 fw-bold">{{ dispersions[2] | int }}</span>
+                </div>
+            </div>
+
+        </div>
+
+                <p class="text-center">Исходя из значений дисперсии делаем вывод что наиболее идентичный переходной процесс
+                    по отношению к исходному переходному процессу мы получаем с помощью <b>{{ answer }}</b></p>
+
+                <h5 class="text-center">
+                    T1 = {{ answer_nums[1] }}
+                    <br>
+                    T2 = {{ answer_nums[0] }}
+                </h5>
+        {% endif %}
     </div>
 
-            <p class="text-center">Исходя из значений дисперсии делаем вывод что наиболее идентичный переходной процесс
-                по отношению к исходному переходному процессу мы получаем с помощью <b>{{ answer }}</b></p>
-
-            <h5 class="text-center">
-                T1 = {{ answer_nums[1] }}
-                <br>
-                T2 = {{ answer_nums[0] }}
-            </h5>
-    {% endif %}
-</div>
+    <div class="row justify-content-center mt-3 mb-3">
+        <div class="col-auto">
+            <a href="/PID_part_3"><button type="button" class="btn btn-primary">Следующая часть</button></a>
+        </div>
+    </div>
 {% endblock %}

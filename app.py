@@ -15,6 +15,58 @@ def main_page():
     return render_template('index.html')
 
 
+def compute_and_plot(T1, T2, K, C2):
+    w = np.arange(0, 0.02, 0.0001)
+    m = 0.3
+    s = (1j - m) * w
+    Wo = (K * np.exp(-60 * s)) / (T1 * (s ** 2) + T2 * s + 1)
+    Wr = 1 / Wo
+    R = np.real(Wr)
+    J = np.imag(Wr)
+
+    Kp = m * J - R + 2 * m * w * C2
+    Ki = w * m * (m ** 2 + 1) * (J + w * C2)
+
+    # Найти максимальное значение Kp и соответствующее значение Ki
+    max_Kp_index = np.argmax(Kp)
+    max_Kp = Kp[max_Kp_index]
+    max_Ki = Ki[max_Kp_index]
+
+    # Определить точки C0 и C1 на определенных процентных уровнях от максимального значения Kp
+    percentage_levels = [0.95, 0.9, 0.85, 0.8]  # Процентные уровни для нахождения точек
+    C0_values = []
+    C1_values = []
+
+    for level in percentage_levels:
+        target_Kp = max_Kp * level
+        # Найти индекс ближайшего значения Kp к target_Kp
+        closest_index = (np.abs(Kp - target_Kp)).argmin()
+        C0_values.append(Kp[closest_index])
+        C1_values.append(Ki[closest_index])
+
+    # Plot the results
+    fig, ax = plt.subplots()
+    ax.plot(Kp, Ki, label=f'C2 = {C2}')
+    plt.xlabel('axis Kp')
+    plt.ylabel('axis Ki')
+    plt.title(f'Плоскость параметров настройки ПИД регулятора при С_2 = {C2}')
+    plt.legend()
+    plt.grid(True)
+
+    # Save plot to a buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Encode buffer to base64 string
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Generate HTML code to display the image
+    image_result = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_result, C0_values, C1_values
+
+
 # Это функция для определения тремя методами передаточных функций
 def transfer_functions_determined_by_three_methods(t1_kos=40,
                                                    t2_kos=240,
@@ -367,6 +419,35 @@ def function_of_main_pid_second():
                                answer_nums=answer_nums)
     return render_template("PID/PID_full_page_2.html")
 
+
+@app.route('/PID_part_3', methods=['GET', 'POST'])
+def function_of_main_pid_third():
+    if request.method == 'POST':
+        T1 = float(request.form['t1_1'])
+        T2 = float(request.form['t2_2'])
+        K = float(request.form['k'])
+        C2_1 = float(request.form['c2_1'])
+        C2_2 = float(request.form['c2_2'])
+        C2_3 = float(request.form['c2_3'])
+
+        first_image, C0_1, C1_1 = compute_and_plot(T1, T2, K, C2_1)
+        second_image, C0_2, C1_2 = compute_and_plot(T1, T2, K, C2_2)
+        third_image, C0_3, C1_3 = compute_and_plot(T1, T2, K, C2_3)
+
+        coefficients_1 = [(C0_1[i], C1_1[i]) for i in range(len(C0_1))]
+        coefficients_2 = [(C0_2[i], C1_2[i]) for i in range(len(C0_2))]
+        coefficients_3 = [(C0_3[i], C1_3[i]) for i in range(len(C0_3))]
+
+        return render_template("PID/PID_full_page_3.html",
+                               first_image=first_image,
+                               second_image=second_image,
+                               third_image=third_image,
+                               coefficients_1=coefficients_1,
+                               coefficients_2=coefficients_2,
+                               coefficients_3=coefficients_3,
+                               C2_1=C2_1, C2_2=C2_2, C2_3=C2_3)
+
+    return render_template("PID/PID_full_page_3.html")
 
 @app.route('/SIMOU', methods=["GET", "POST"])
 def method_simou():
