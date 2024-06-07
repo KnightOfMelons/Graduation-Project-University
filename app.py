@@ -15,6 +15,85 @@ def main_page():
     return render_template('index.html')
 
 
+def transient_process_using_a_regulator(T1, T2, K, C0, C1, C2):
+    # Параметры системы
+    numerator = [1]
+    denominator = [T1, T2, 1]
+    plant = ctl.TransferFunction(numerator, denominator)
+
+    # Коэффициент усиления
+    gain = K
+    gain_block = ctl.TransferFunction([gain], [1])
+
+    # ПИД-регулятор с заданными значениями
+    Kp = C0
+    Ki = C1
+    Kd = C2
+    N = 1  # Коэффициент фильтра
+
+    # Идеальная форма ПИД-регулятора с фильтрацией деривационного члена
+    pid = Kp * (1 + ctl.TransferFunction([Ki], [1, 0]) + ctl.TransferFunction([Kd * N, 0], [1, N]))
+
+    # Добавление транспортной задержки с аппроксимацией Pade
+    time_delay = 60
+    num, den = ctl.pade(time_delay, 10)  # Используем более высокую аппроксимацию Pade
+    delay_block = ctl.TransferFunction(num, den)
+
+    # Формирование открытой системы с учетом ПИД-регулятора и усилителя
+    open_loop = ctl.series(gain_block, plant, delay_block)
+
+    # Замкнутая система с отрицательной обратной связью
+    closed_loop = ctl.feedback(open_loop, pid, sign=-1)
+
+    # Входное воздействие
+    t = np.linspace(0, 2500, 10000, dtype=np.float64)  # Временной диапазон для лучшего соответствия
+    u = np.ones_like(t, dtype=np.float64) * 30  # Ступенчатое воздействие с конечным значением 30
+
+    # Ответ системы
+    t, y = ctl.forced_response(closed_loop, t, u)
+
+    # Вычисление интеграла от квадрата сигнала управления
+    u_response = np.abs(y) ** 2
+    integral = np.trapz(u_response, t)
+
+    # Возвращение результатов в экспоненциальной нотации
+    integral_formatted = "{:.2e}".format(integral)
+
+    return t, y, integral_formatted
+
+
+def calculate_integrals(T1, T2, K, C0_list, C1_list, C2):
+    integrals = []
+    for C0, C1 in zip(C0_list, C1_list):
+        _, _, integral_formatted = transient_process_using_a_regulator(T1, T2, K, C0, C1, C2)
+        integrals.append(integral_formatted)
+    return integrals
+
+
+def plot_system_response(t, y):
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график
+    ax.plot(t, y, 'y')
+    plt.title('Переходной процесс с помощью использования регулятора')
+    plt.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    # Возвращаем HTML-код и данные
+    return image_html
+
+
 def compute_and_plot(T1, T2, K, C2):
     w = np.arange(0, 0.02, 0.0001)
     m = 0.3
@@ -434,9 +513,24 @@ def function_of_main_pid_third():
         second_image, C0_2, C1_2 = compute_and_plot(T1, T2, K, C2_2)
         third_image, C0_3, C1_3 = compute_and_plot(T1, T2, K, C2_3)
 
-        coefficients_1 = [(C0_1[i], C1_1[i]) for i in range(len(C0_1))]
-        coefficients_2 = [(C0_2[i], C1_2[i]) for i in range(len(C0_2))]
-        coefficients_3 = [(C0_3[i], C1_3[i]) for i in range(len(C0_3))]
+        integrals_1 = calculate_integrals(T1, T2, K, C0_1, C1_1, C2_1)
+        integrals_2 = calculate_integrals(T1, T2, K, C0_2, C1_2, C2_2)
+        integrals_3 = calculate_integrals(T1, T2, K, C0_3, C1_3, C2_3)
+
+        coefficients_1 = [(C0_1[i], C1_1[i], integrals_1[i]) for i in range(len(C0_1))]
+        coefficients_2 = [(C0_2[i], C1_2[i], integrals_2[i]) for i in range(len(C0_2))]
+        coefficients_3 = [(C0_3[i], C1_3[i], integrals_3[i]) for i in range(len(C0_3))]
+
+        # Найти минимальный интеграл и соответствующие коэффициенты
+        all_integrals = integrals_1 + integrals_2 + integrals_3
+        all_coefficients = coefficients_1 + coefficients_2 + coefficients_3
+        min_integral_index = all_integrals.index(min(all_integrals, key=lambda x: float(x)))
+        min_C0, min_C1, _ = all_coefficients[min_integral_index]
+        min_C2 = [C2_1, C2_2, C2_3][min_integral_index // len(C0_1)]
+
+        # Построить график для минимального интеграла
+        t, y, _ = transient_process_using_a_regulator(T1, T2, K, min_C0, min_C1, min_C2)
+        min_integral_image = plot_system_response(t, y)
 
         return render_template("PID/PID_full_page_3.html",
                                first_image=first_image,
@@ -445,9 +539,12 @@ def function_of_main_pid_third():
                                coefficients_1=coefficients_1,
                                coefficients_2=coefficients_2,
                                coefficients_3=coefficients_3,
-                               C2_1=C2_1, C2_2=C2_2, C2_3=C2_3)
+                               C2_1=C2_1, C2_2=C2_2, C2_3=C2_3,
+                               min_integral_image=min_integral_image,
+                               min_C0=min_C0, min_C1=min_C1, min_C2=min_C2)
 
     return render_template("PID/PID_full_page_3.html")
+
 
 @app.route('/SIMOU', methods=["GET", "POST"])
 def method_simou():
