@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import numpy as np
-from scipy.signal import lti, step
+from scipy.signal import lti, step, find_peaks
 from scipy.interpolate import interp1d
 import control as ctl
 
@@ -71,27 +71,80 @@ def calculate_integrals(T1, T2, K, C0_list, C1_list, C2):
 
 
 def plot_system_response(t, y):
-    # Создаем новую фигуру и оси
+    # Create a new figure and axis
     fig, ax = plt.subplots()
 
-    # Строим график
+    # Plot the graph
     ax.plot(t, y, 'y')
     plt.title('Переходной процесс с помощью использования регулятора')
     plt.grid(True)
 
-    # Сохраняем график в буфер
+    # Find peaks
+    peaks, _ = find_peaks(y)
+
+    # Identify the highest peak (A6)
+    A6_index = np.argmax(y)
+    # A6_time = t[A6_index]
+    A6_value = y[A6_index]
+
+    # Find the local minima
+    minima_indices = (np.diff(np.sign(np.diff(y))) > 0).nonzero()[0] + 1
+
+    # Identify the first significant local minimum after the highest peak (A12)
+    minima_after_A6 = [i for i in minima_indices if i > A6_index]
+    if minima_after_A6:
+        A12_index = minima_after_A6[0]
+        A12_value = y[A12_index]
+    else:
+        A12_index = None
+        A12_value = None
+
+    # Identify the next peak after this local minimum (A7)
+    peaks_after_A12 = [i for i in peaks if i > A12_index]
+    if peaks_after_A12:
+        A7_index = peaks_after_A12[0]
+        A7_value = y[A7_index]
+    else:
+        A7_index = None
+        A7_value = None
+
+    # Annotate the points A1 (A6), A2 (A12), and A3 (A7)
+    if A6_index is not None:
+        ax.plot(t[A6_index], y[A6_index], "ro")
+        ax.annotate('A1', (t[A6_index], y[A6_index]), textcoords="offset points", xytext=(0, 10), ha='center',
+                    color='brown')
+    if A12_index is not None:
+        ax.plot(t[A12_index], y[A12_index], "ro")
+        ax.annotate('A2', (t[A12_index], y[A12_index]), textcoords="offset points", xytext=(0, 10), ha='center',
+                    color='brown')
+    if A7_index is not None:
+        ax.plot(t[A7_index], y[A7_index], "ro")
+        ax.annotate('A3', (t[A7_index], y[A7_index]), textcoords="offset points", xytext=(0, 10), ha='center',
+                    color='brown')
+
+    # Find the value of the first maximum y_M
+    y_M = max(y)
+    # t_M_index = np.argmax(y)
+    # t_M = t[t_M_index]
+
+    # Find the settling time t_p
+    threshold = 0.02 * y_M  # Threshold for determining the settled value
+    t_p_index = next(i for i in range(len(y) - 1, 0, -1) if y[i] > threshold)
+    t_p = t[t_p_index]
+
+    # Save the plot to a buffer
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
 
-    # Кодируем буфер в base64 строку
+    # Encode the buffer to a base64 string
     image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
 
-    # Генерируем HTML-код для отображения картинки
+    # Generate HTML code to display the image
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
-    # Возвращаем HTML-код и данные
-    return image_html
+    # Return the HTML code and data
+    return image_html, A6_value, A12_value, A7_value, t_p
 
 
 def compute_and_plot(T1, T2, K, C2):
@@ -240,8 +293,8 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
 
 # Функция для вычисления трёх методов Симою
 def simou_method(y, t, input_K=1):
-    # Number of data points
-    a = len(y)
+    # # Number of data points
+    # a = len(y)
 
     # Calculation of e
     e = 1 - y / y[-1]
@@ -530,7 +583,10 @@ def function_of_main_pid_third():
 
         # Построить график для минимального интеграла
         t, y, _ = transient_process_using_a_regulator(T1, T2, K, min_C0, min_C1, min_C2)
-        min_integral_image = plot_system_response(t, y)
+        min_integral_image, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
+
+        first_calculation = (A2_value / A1_value) * 100
+        second_calculation = 1 - (A3_value / A1_value)
 
         return render_template("PID/PID_full_page_3.html",
                                first_image=first_image,
@@ -541,7 +597,10 @@ def function_of_main_pid_third():
                                coefficients_3=coefficients_3,
                                C2_1=C2_1, C2_2=C2_2, C2_3=C2_3,
                                min_integral_image=min_integral_image,
-                               min_C0=min_C0, min_C1=min_C1, min_C2=min_C2)
+                               min_C0=min_C0, min_C1=min_C1, min_C2=min_C2,
+                               A1_value=A1_value, A2_value=A2_value, A3_value=A3_value,
+                               t_M=A1_value, t_p=t_p,
+                               first_calculation=first_calculation, second_calculation=second_calculation)
 
     return render_template("PID/PID_full_page_3.html")
 
