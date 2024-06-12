@@ -76,7 +76,7 @@ def plot_system_response(t, y):
 
     # Plot the graph
     ax.plot(t, y, 'y')
-    plt.title('Переходной процесс с помощью использования регулятора')
+    plt.title('Переходной процесс с использованием регулятора')
     plt.grid(True)
 
     # Find peaks
