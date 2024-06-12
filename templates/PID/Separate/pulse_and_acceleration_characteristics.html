@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block title %}Импульсная и разгонная хар-ка{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <h1 class="text-center mb-4">Введите исходные данные для построения импульсной и разгонной характеристики:</h1>
+        <form action="/pulse_and_acceleration_characteristics" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_0" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_1" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2" value="40" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_3" value="60" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_4" value="80" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_5" value="100" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_6" value="120" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_7" value="140" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_8" value="160" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_9" value="180" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_10" value="200" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_11" value="220" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_12" value="240" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_13" value="260" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_14" value="280" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_15" value="300" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_16" value="320" required>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">Ø:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_0" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_1" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_2" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_3" value="1" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_4" value="2" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_5" value="5" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_6" value="10" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_7" value="12" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_8" value="14" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_9" value="15" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_10" value="14" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_11" value="12" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_12" value="10" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_13" value="6" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_14" value="3" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_15" value="1" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_16" value="0" required>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">τимп:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="tau" value="35" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">Xвх. имп:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="x_values_imp" value="25" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">at:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="at" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">aθ:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="a_theta" value="1.0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">М:</label>
+                    <input type="text" class="form-control input-field-for-PID" style="width: 3.5rem;" name="M" value="1.55" required>
+                </div>
+            </div>
+
+            <div class="text-center mb-3 my-2">
+                <input type="submit" class="btn btn-primary" value="Построить график">
+            </div>
+        </form>
+
+        {% if image_impulse %}
+            <div class="d-flex justify-content-center my-4">
+                {{ image_impulse | safe }}
+            </div>
+        {% endif %}
+
+        {% if numbers %}
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+
+                    <div class="math-expression">
+                        <h5 class="mb-0">T<span class="subscript">a</span> = F<span class="subscript">λ</span> / σ<span class="subscript">(макс.имп)</span> = {{ numbers[9] }} / {{ numbers[8] }} = {{ numbers[5] }}</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-0">k = F<span class="subscript">σ</span> / F<span class="subscript">λ</span> =
+                            {{ numbers[10] }} / {{ numbers[9] }} = {{ numbers[6] }}</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-3">τ = {{ numbers[7] }}</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-3">F<span class="subscript">λ</span>={{ numbers[9] }} площадь, описываемая кривой изменения возмущения.</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-3">F<span class="subscript">σ</span>={{ numbers[10] }} площадь, описываемая кривой изменения регулируемой величины.</h5>
+                    </div>
+
+                    <div class="math-expression">
+                        <h5 class="mb-3">σ<span class="subscript">(макс.имп)</span> - максимальное отклонение регулируемой величины</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if image_acceleration_charact %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_acceleration_charact | safe }}
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">При помощи метода касательной значение <b>τ, T_1, T_2, K</b> равны:</label>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">K = Y_вых / Xвх.имп</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="Yvih_value" value="105" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">/</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="Xvhod_imp" value="30" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label" id="equalSign" style="display: none;">=</label>
+                </div>
+                <div class="col-auto my-2">
+                    <span id="resultK" class="form-label"></span>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">τ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t_value" value="60" required>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T2 = </label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="240" required>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T1 = </label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T1_value" value="40" required>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-3 mb-3">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" id="calculateK">Рассчитать</button>
+                    <button id="helpButton" class="btn btn-primary">Помощь</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="helpContent" class="mt-3 d-none">
+            <div class="d-flex justify-content-center">
+                <img src="{{ url_for('static', filename='img/acceleration_help_pic.jpg')}}" class="img-fluid" alt="Help Image">
+            </div>
+            <div class="d-flex justify-content-center">
+                <div class="text-center p-2">
+                    <p>Так выглядел метод касательной у меня.<b> τ=60 с</b>, то есть первая точка с положительным значением <b>Ø</b>.
+                    <b>T_2=240 с</b>. <b>T_1=40 c</b>. <b>Y_вых = 105</b>.<b> Xвх.имп = 25 (как в методичке)</b> .
+                        Метод неточный, значения подгоняются, исходя из диаграммы разгонной характеристики.
+                        <br>
+                        Линии можно нарисовать в Excel или любом другом графическом редакторе.
+                    </p>
+
+                    <hr class="my-4">
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">Для нахождения параметров <b>T_1,T_2</b> методом Ольденбурга-Сарториуса найдем:</label>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">Tc / Ta = </label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="Tc_value" value="200" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label">/</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="Ta_value" value="240" required>
+                </div>
+                <div class="col-auto my-2">
+                    <label class="form-label" id="equalSignTcTa" style="display: none;">=</label>
+                </div>
+                <div class="col-auto my-2">
+                    <span id="resultTcTa" class="form-label"></span>
+                </div>
+            </div>
+
+                <div class="row justify-content-center mt-3 mb-3">
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-primary" id="calculateTcTa">Рассчитать</button>
+                    </div>
+                </div>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">Исходя из отношения <b>T_c / T_a</b> воспользовавшись диаграммой Ольденбурга-Сарториуса определим <b>T_1,T_2</b>:</label>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T_2 / T_a = </label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="endanswer_1" value="0.7" required>
+                </div>
+                <div class="col-auto my-2">
+                    <span id="resultT2Ta" class="form-label"></span>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T_1 / T_a = </label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="endanswer_2" style="width: 3.5rem;" value="0.83" required>
+                </div>
+                <div class="col-auto my-2">
+                    <span id="resultT1Ta" class="form-label"></span>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-3 mb-3">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" id="calculateT2Ta">Рассчитать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+<script src="{{ url_for('static', filename='js/calculateT2T1Ta.js') }}"></script>
+<script src="{{ url_for('static', filename='js/calculateTcTa.js') }}"></script>
+<script src="{{ url_for('static', filename='js/calculateK.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script_for_help_acceleration.js') }}"></script>
+{% endblock %}

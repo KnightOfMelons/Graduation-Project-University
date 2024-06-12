@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Построение плоскости параметров{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-center mb-4">Введите данные для построения плоскости параметров:</h1>
+        <form action="/construction_of_parameter_plane" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_1" style="width: 5rem;" value="7436.27" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="t2_2" style="width: 5rem;" value="131.71" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Первый C2:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="c2_1" style="width: 5rem;" value="40.00035" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Второй C2:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="c2_2" style="width: 5rem;" value="38.00035" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Третий C2:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="c2_3" style="width: 5rem;" value="33.00035" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">K:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="k" style="width: 5rem;" value="3.5" required>
+                </div>
+
+                <div class="text-center my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить">
+                </div>
+            </div>
+        </form>
+
+    {% if first_image %}
+        <div class="text-center">
+            <p>Таблица коэффициентов при C2={{ C2_1 }}</p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>C0</th>
+                        <th>C1</th>
+                        <th>I^2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c0, c1, integral in coefficients_1 %}
+                    <tr>
+                        <td>{{ "%.6f"|format(c0|float) }}</td>
+                        <td>{{ "%.6f"|format(c1|float) }}</td>
+                        <td>{{ integral }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ first_image | safe }}
+        </div>
+    {% endif %}
+
+    {% if second_image %}
+        <div class="text-center">
+            <p>Таблица коэффициентов при C2={{ C2_2 }}</p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>C0</th>
+                        <th>C1</th>
+                        <th>I^2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c0, c1, integral in coefficients_2 %}
+                    <tr>
+                        <td>{{ "%.6f"|format(c0|float) }}</td>
+                        <td>{{ "%.6f"|format(c1|float) }}</td>
+                        <td>{{ integral }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ second_image | safe }}
+        </div>
+    {% endif %}
+
+    {% if third_image %}
+        <div class="text-center">
+            <p>Таблица коэффициентов при C2={{ C2_3 }}</p>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>C0</th>
+                        <th>C1</th>
+                        <th>I^2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c0, c1, integral in coefficients_3 %}
+                    <tr>
+                        <td>{{ "%.6f"|format(c0|float) }}</td>
+                        <td>{{ "%.6f"|format(c1|float) }}</td>
+                        <td>{{ integral }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ third_image | safe }}
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}

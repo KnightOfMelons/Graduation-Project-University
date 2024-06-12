@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Наиболее идентичный пер. процесс{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-center mb-4">Введите данные для построения переходного процесса с использованием ПИД-регулятора:</h1>
+        <form action="/most_identical_transient_process" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_1" style="width: 5rem;" value="7436.27" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="t2_2" style="width: 5rem;" value="131.71" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">C0:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="min_C0" style="width: 5rem;" value="0.6732343264084807" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">C1:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="min_C1" style="width: 5rem;" value="0.002690083400439207" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">C2:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="min_C2" style="width: 5rem;" value="40.00035" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">K:</label>
+                    <input type="text" class="form-control input-field-for-PID"  name="k" style="width: 5rem;" value="3.5" required>
+                </div>
+
+                <div class="text-center my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить">
+                </div>
+            </div>
+        </form>
+
+        {% if min_integral_image %}
+            <div class="text-center">
+                <p>Настройки регулятора примем:</p>
+                <p>C<sub>0</sub>=<b>{{ "%.6f"|format(min_C0|float) }}</b></p>
+                <p>C<sub>1</sub>=<b>{{ "%.6f"|format(min_C1|float) }}</b></p>
+                <p>C<sub>2</sub>=<b>{{ "%.6f"|format(min_C2|float) }}</b></p>
+
+                {{ min_integral_image | safe }}
+            </div>
+
+            <div class="text-center">
+                <p>Оценим качество переходного процесса </p>
+                <p>Колебательность равняется:</p>
+                <img src="{{ url_for('static', filename='img/colebatelnost.jpg') }}" class="img-fluid mb-2" style="width: 15%;"> {{ first_calculation | round(2)  }} %
+                <p>Степень затухания:</p>
+                <img src="{{ url_for('static', filename='img/stepen_zatuhania.jpg') }}" style="width: 15%;">{{ second_calculation | round(2) }}
+                <p>Длительность переходного процесса <b>t_п = {{ t_p | int }}</b></p>
+                <p>Время достижения первого максимума <b>t_М = {{ t_M | int }}</b></p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

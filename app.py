@@ -447,6 +447,9 @@ def impulse_transient_plot(x_values, y_values):
     return image_impulse
 
 
+# ======================================================================================================
+# =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
+# ======================================================================================================
 @app.route("/PID_part_1", methods=["GET", "POST"])
 def function_of_main_pid_page_first():
     if request.method == "POST":
@@ -588,6 +591,12 @@ def function_of_main_pid_third():
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
 
+        print(f"T1 = {T1}, T2 = {T2}, K = {K},"
+              f" min_C0 = {min_C0},"
+              f" min_C1 =  {min_C1},"
+              f" min_C2 = {min_C2},"
+              f"t = {t}, y = {y}")
+
         return render_template("PID/PID_full_page_3.html",
                                first_image=first_image,
                                second_image=second_image,
@@ -604,6 +613,119 @@ def function_of_main_pid_third():
 
     return render_template("PID/PID_full_page_3.html")
 
+
+# =============== Отдельная страница для построения импульсной и разгонной характеристики ==============
+@app.route('/pulse_and_acceleration_characteristics', methods=['GET', 'POST'])
+def function_of_pulse_and_acceleration_characteristics():
+    if request.method == "POST":
+        # ===== Беру значения с сайта =====
+        x_values = [float(request.form[f"xValues_{i}"]) for i in range(17)]
+        y_values = [float(request.form[f"yValues_{i}"]) for i in range(17)]
+
+        # ===== Беру также значения с сайта =====
+        tau = float(request.form["tau"])
+        x_values_imp = float(request.form["x_values_imp"])
+        at = float(request.form["at"])
+        a_theta = float(request.form["a_theta"])
+        M = float(request.form["M"])
+
+        # Вычисляю Ta, k, τ, Fλ, Fσ
+        Fl = (tau * at)
+        o = max(y_values)
+        Ta = round(Fl / max(y_values), 1)
+        Fo = calculate_total_area(x_values, y_values)
+        k = round(Fo / Fl, 1)
+        t = find_first_positive_index(y_values, x_values)
+
+        # ====================== Тут создается импульсная переходная характеристика =================================
+
+        image_impulse = impulse_transient_plot(x_values, y_values)
+
+        # ====================================== Разгонная характеристика ===========================================
+
+        image_acceleration_charact, z_values = acceleration_characteristic(x_values, y_values)
+
+        return render_template('PID/Separate/pulse_and_acceleration_characteristics.html',
+                               image_impulse=image_impulse,
+                               numbers=[tau, x_values_imp, at, a_theta, M, Ta, k, t, o, Fl, Fo],
+                               image_acceleration_charact=image_acceleration_charact)
+
+    return render_template("PID/Separate/pulse_and_acceleration_characteristics.html")
+
+
+# =============== Отдельная страница для переходной характеристики трёх моделей ========================
+@app.route('/step_response_of_three_models', methods=['GET', 'POST'])
+def function_of_step_response_of_three_models():
+    return render_template("PID/Separate/step_response_of_three_models.html")
+
+
+# ==================== Отдельная страница для построения плоскости параметров ===========================
+@app.route('/construction_of_parameter_plane', methods=['GET', 'POST'])
+def function_of_construction_of_parameter_plane():
+    if request.method == 'POST':
+        T1 = float(request.form['t1_1'])
+        T2 = float(request.form['t2_2'])
+        K = float(request.form['k'])
+        C2_1 = float(request.form['c2_1'])
+        C2_2 = float(request.form['c2_2'])
+        C2_3 = float(request.form['c2_3'])
+
+        first_image, C0_1, C1_1 = compute_and_plot(T1, T2, K, C2_1)
+        second_image, C0_2, C1_2 = compute_and_plot(T1, T2, K, C2_2)
+        third_image, C0_3, C1_3 = compute_and_plot(T1, T2, K, C2_3)
+
+        integrals_1 = calculate_integrals(T1, T2, K, C0_1, C1_1, C2_1)
+        integrals_2 = calculate_integrals(T1, T2, K, C0_2, C1_2, C2_2)
+        integrals_3 = calculate_integrals(T1, T2, K, C0_3, C1_3, C2_3)
+
+        coefficients_1 = [(C0_1[i], C1_1[i], integrals_1[i]) for i in range(len(C0_1))]
+        coefficients_2 = [(C0_2[i], C1_2[i], integrals_2[i]) for i in range(len(C0_2))]
+        coefficients_3 = [(C0_3[i], C1_3[i], integrals_3[i]) for i in range(len(C0_3))]
+
+        return render_template("PID/Separate/construction_of_parameter_plane.html",
+                               first_image=first_image,
+                               second_image=second_image,
+                               third_image=third_image,
+                               coefficients_1=coefficients_1,
+                               coefficients_2=coefficients_2,
+                               coefficients_3=coefficients_3,
+                               C2_1=C2_1, C2_2=C2_2, C2_3=C2_3)
+
+    return render_template("PID/Separate/construction_of_parameter_plane.html")
+
+
+# ================ Отдельная страница для наиболее идентичного переходного процесса =====================
+@app.route('/most_identical_transient_process', methods=['GET', 'POST'])
+def function_of_most_identical_transient_process():
+    # Переделать, не работает
+    if request.method == 'POST':
+        T1 = float(request.form['t1_1'])
+        T2 = float(request.form['t2_2'])
+        K = float(request.form['k'])
+        min_C0 = float(request.form['min_C0'])
+        min_C1 = float(request.form['min_C1'])
+        min_C2 = float(request.form['min_C2'])
+
+        # Построить график для минимального интеграла
+        t, y, _ = transient_process_using_a_regulator(T1, T2, K, min_C0, min_C1, min_C2)
+        min_integral_image, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
+
+        first_calculation = (A2_value / A1_value) * 100
+        second_calculation = 1 - (A3_value / A1_value)
+
+        return render_template("PID/Separate/most_identical_transient_process.html",
+                               min_integral_image=min_integral_image,
+                               min_C0=min_C0, min_C1=min_C1, min_C2=min_C2,
+                               A1_value=A1_value, A2_value=A2_value, A3_value=A3_value,
+                               t_M=A1_value, t_p=t_p,
+                               first_calculation=first_calculation, second_calculation=second_calculation)
+
+    return render_template("PID/Separate/most_identical_transient_process.html")
+
+
+# ======================================================================================================
+# ========================================== Метод Симою ===============================================
+# ======================================================================================================
 
 @app.route('/SIMOU', methods=["GET", "POST"])
 def method_simou():

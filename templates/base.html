@@ -35,7 +35,22 @@
         </div>
 
         <ul class="nav nav-pills">
-          <li class="nav-item"><a href="/PID_part_1" class="nav-link">ПИД-регулятор</a></li>
+          <li class="nav-item">
+            <div class="btn-group">
+              <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ПИД-регулятор
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/pulse_and_acceleration_characteristics">Импульсная и разгонная хар-ка</a>
+                <a class="dropdown-item" href="/SIMOU">Метод Симою</a>
+                <a class="dropdown-item" href="/step_response_of_three_models">Переходная характеристика трёх моделей</a>
+                <a class="dropdown-item" href="/construction_of_parameter_plane">Построение плоскости параметров</a>
+                <a class="dropdown-item" href="/most_identical_transient_process">Наиболее идентичный пер. процесс</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/PID_part_1">Полный расчёт</a>
+              </div>
+            </div>
+          </li>
           <li class="nav-item"><a href="#" class="nav-link">ПИ-регулятор</a></li>
           <li class="nav-item"><a href="/SIMOU" class="nav-link">Симою</a></li>
           <li class="nav-item"><a href="#" class="nav-link">Комбинированная система</a></li>
