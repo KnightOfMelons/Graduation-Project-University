@@ -527,8 +527,12 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
     points_C1 = filtered_C1[points_indices]
     points_C0 = filtered_C0[points_indices]
 
-    # Создаем список коэффициентов
-    coefficients = [(points_C0[i], points_C1[i]) for i in range(len(points_C0))]
+    # Создаем список коэффициентов с интегралами
+    coefficients_with_integrals = []
+    for C1_val, C0_val  in zip(points_C0, points_C1):
+        integral = calculate_integral(T1, T2, k, round(C0_val, 6), round(C1_val, 6), True)
+        print(integral)
+        coefficients_with_integrals.append((C0_val, C1_val, integral))
 
     # Создаем новую фигуру и оси
     fig, ax = plt.subplots()
@@ -552,13 +556,13 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
     # Генерируем HTML-код для отображения картинки
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
-    return image_html, coefficients
+    return image_html, coefficients_with_integrals
 
 
-def calculate_integral(T1, T2, K, C0, C1):
+def calculate_integral(T1, T2, K, C0, C1, choise_plot_or_not=True):
     # Параметры системы
     numerator = [1]
-    denominator = [T1, T2, 1]
+    denominator = [T2, T1, 1]
     plant = ctl.TransferFunction(numerator, denominator)
 
     # Коэффициент усиления
@@ -592,9 +596,35 @@ def calculate_integral(T1, T2, K, C0, C1):
     u_response = np.abs(y) ** 2
     integral = np.trapz(u_response, t)
 
-    # Возвращение интеграла
-    return integral
+    if choise_plot_or_not == True:
+        return integral
+    else:
+        return t,y
 
+
+def plot_response_pi_controller(t, y):
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Строим график
+    ax.plot(t, y, 'y')
+    ax.set_title('Step Response with PI Controller and Feedback')
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Response')
+    ax.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_html
 # ======================================================================================================
 # =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
 # ======================================================================================================
@@ -907,16 +937,15 @@ def function_of_main_pi_page_first():
         stop_time = int(request.form['stop_time'])
         m = -math.log(1 - y_value) / (2 * math.pi)
 
-
         image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
-        image_D_graph, coefficients  = generate_system_response(k_value, T2_value, T1_value)
+        image_D_graph, coefficients_with_integrals = generate_system_response(k_value, T2_value, T1_value)
 
         return render_template('PI/PI_full_page.html',
                                image_transmission_funct=image_transmission_funct,
                                y_value=y_value,
                                m=round(m, 3),
                                image_D_graph=image_D_graph,
-                               coefficients=coefficients)
+                               coefficients_with_integrals=coefficients_with_integrals)
 
     return render_template('PI/PI_full_page.html')
 

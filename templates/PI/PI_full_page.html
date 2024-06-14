@@ -97,10 +97,11 @@
                 </thead>
 
                 <tbody>
-                    {% for c0, c1 in coefficients %}
+                    {% for c0, c1, i in coefficients_with_integrals %}
                     <tr>
                         <td>{{ "%.6f"|format(c0|float) }}</td>
                         <td>{{ "%.6f"|format(c1|float) }}</td>
+                        <td>{{ "%.3f"|format(i|float) }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
