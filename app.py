@@ -6,6 +6,7 @@ import numpy as np
 from scipy.signal import lti, step, find_peaks
 from scipy.interpolate import interp1d
 import control as ctl
+import math
 
 app = Flask(__name__)
 
@@ -447,6 +448,153 @@ def impulse_transient_plot(x_values, y_values):
     return image_impulse
 
 
+# Функция для передаточной фукнции мат модели граф. метода
+def transmission_function_for_math_model(k=22.9, T2=1712.0, T1=126.4, t_stop=2000):
+    # Define the transfer function
+    num = [k]
+    den = [T2, T1, 1]
+    sys = ctl.TransferFunction(num, den)
+
+    # Define the transport delay parameters
+    time_delay = 30
+    # initial_output = 0
+    # initial_buffer_size = 1024
+
+    # Create time vector
+    t = np.linspace(0, t_stop, 5000)
+
+    # Create input step function with delay
+    u = np.zeros_like(t)
+    u[int(time_delay / (t_stop / len(t))):] = 1
+
+    # Simulate the system response
+    t_out, y_out = ctl.forced_response(sys, T=t, U=u)
+
+    # Create a new figure and axes
+    fig, ax = plt.subplots()
+
+    # Plot the results
+    ax.plot(t_out, y_out, 'y', linewidth=1.5)
+    plt.title('Передаточная функция объекта управления')
+    plt.grid(True)
+
+    # Save the plot to a buffer
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Encode the buffer to base64 string
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Generate HTML code for displaying the image
+    image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_html
+
+
+def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
+    # Define the transfer function
+    m = 0.192
+    w = np.linspace(0, 0.18, 100)  # диапазон частоты от 0 до 0.18, 100 точек
+    p = -m * w + 1j * w  # комплексная частота
+
+    # Задаем ПФ объекта
+    Wo = k / (T2 * p**2 + T1 * p + 1) * np.exp(-30 * p)  # задаем ПФ
+
+    # инверсная ПФ
+    W1 = 1 / Wo
+
+    C0 = w * (1 + m**2) * np.imag(W1)
+    C1 = -np.real(W1) + m * np.imag(W1)
+
+    # Ограничение области графика
+    x_min, x_max = 0, 0.2
+    y_min, y_max = 0, 0.002
+
+    # Фильтруем данные в пределах области графика
+    valid_indices = (C1 >= x_min) & (C1 <= x_max) & (C0 >= y_min) & (C0 <= y_max)
+    filtered_C1 = C1[valid_indices]
+    filtered_C0 = C0[valid_indices]
+
+    # Найти точку максимума в пределах области
+    max_index = np.argmax(filtered_C0)
+
+    # Найти дополнительные точки правее максимума
+    num_points = 5
+    points_indices = np.arange(max_index, max_index + num_points + 1)
+    points_indices = points_indices[(points_indices >= 0) & (points_indices < len(filtered_C1))]
+
+    points_C1 = filtered_C1[points_indices]
+    points_C0 = filtered_C0[points_indices]
+
+    # Создаем список коэффициентов
+    coefficients = [(points_C0[i], points_C1[i]) for i in range(len(points_C0))]
+
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график
+    ax.plot(C1, C0)
+    ax.scatter(points_C1, points_C0, color='red', zorder=5, label='Выбранные точки')  # Отметить точки на графике
+    ax.axis((0, 0.2, 0, 0.002))
+    ax.set_title('Кривая равной степени колебательности')
+    ax.grid(True)
+    ax.legend()
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_html, coefficients
+
+
+def calculate_integral(T1, T2, K, C0, C1):
+    # Параметры системы
+    numerator = [1]
+    denominator = [T1, T2, 1]
+    plant = ctl.TransferFunction(numerator, denominator)
+
+    # Коэффициент усиления
+    gain = K
+    gain_block = ctl.TransferFunction([gain], [1])
+
+    # ПИ-регулятор с заданными значениями в параллельной форме
+    Kp = C0
+    Ki = C1
+    pi_controller = ctl.TransferFunction([Kp, Ki], [1, 0])
+
+    # Добавление транспортной задержки с аппроксимацией Pade
+    time_delay = 30
+    num, den = ctl.pade(time_delay, 10)
+    delay_block = ctl.TransferFunction(num, den)
+
+    # Формирование открытой системы с учетом ПИ-регулятора и усилителя
+    open_loop = ctl.series(gain_block, plant, delay_block)
+
+    # Замкнутая система с отрицательной обратной связью
+    closed_loop = ctl.feedback(open_loop, pi_controller, sign=-1)
+
+    # Входное воздействие
+    t = np.linspace(0, 2000, 10000, dtype=np.float64)
+    u = np.ones_like(t, dtype=np.float64) * 1
+
+    # Ответ системы
+    t, y = ctl.forced_response(closed_loop, t, u)
+
+    # Вычисление интеграла от квадрата сигнала управления
+    u_response = np.abs(y) ** 2
+    integral = np.trapz(u_response, t)
+
+    # Возвращение интеграла
+    return integral
+
 # ======================================================================================================
 # =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
 # ======================================================================================================
@@ -744,5 +892,32 @@ def method_simou():
 
     return render_template('simou_methods.html')
 
+
+# ======================================================================================================
+# =========================== Мат. модели графоаналитическим методом ===================================
+# ======================================================================================================
+@app.route('/PI_first_page', methods=["GET", "POST"])
+def function_of_main_pi_page_first():
+    if request.method == "POST":
+        T2_value = float(request.form['T2_value'])
+        T1_value = float(request.form['T1_value'])
+        t_value = float(request.form['t_value'])
+        k_value = float(request.form['k_value'])
+        y_value = float(request.form['y_value'])
+        stop_time = int(request.form['stop_time'])
+        m = -math.log(1 - y_value) / (2 * math.pi)
+
+
+        image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
+        image_D_graph, coefficients  = generate_system_response(k_value, T2_value, T1_value)
+
+        return render_template('PI/PI_full_page.html',
+                               image_transmission_funct=image_transmission_funct,
+                               y_value=y_value,
+                               m=round(m, 3),
+                               image_D_graph=image_D_graph,
+                               coefficients=coefficients)
+
+    return render_template('PI/PI_full_page.html')
 
 app.run(debug=True)
