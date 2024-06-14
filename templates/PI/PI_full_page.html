@@ -106,8 +106,28 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-        {% endif %}
+            {% endif %}
 
+            {% if image_transmission_funct_PI_controller %}
+            <p class="text-center">За оптимальные настройки регулятора примем:</p>
+            <p>C0 = <b>{{ "%.6f"|format(min_C0|float) }}</b><br>C1 = <b>{{ "%.6f"|format(min_C1|float) }}</b></p>
+
+            <div class="text-center">
+                    {{ image_transmission_funct_PI_controller | safe }}
+            </div>
+
+
+            <div class="text-center">
+                <p>Оценим качество переходного процесса </p>
+                <p>Колебательность равняется:</p>
+                <img src="{{ url_for('static', filename='img/colebatelnost.jpg') }}" class="img-fluid mb-2" style="width: 15%;"> {{ first_calculation | round(2)  }} %
+                <p>Степень затухания:</p>
+                <img src="{{ url_for('static', filename='img/stepen_zatuhania.jpg') }}" style="width: 15%;">{{ second_calculation | round(2) }}
+                <p>Длительность переходного процесса <b>t_п = {{ t_p | int }}</b></p>
+                <p>Время достижения первого максимума <b>t_М = {{ t_M | int }}</b></p>
+            </div>
+
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

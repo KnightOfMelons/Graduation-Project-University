@@ -529,10 +529,13 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
 
     # Создаем список коэффициентов с интегралами
     coefficients_with_integrals = []
-    for C1_val, C0_val  in zip(points_C0, points_C1):
+    for C1_val, C0_val in zip(points_C0, points_C1):
         integral = calculate_integral(T1, T2, k, round(C0_val, 6), round(C1_val, 6), True)
-        print(integral)
         coefficients_with_integrals.append((C0_val, C1_val, integral))
+
+    # Найти наименьший интеграл
+    min_integral = min(coefficients_with_integrals, key=lambda x: x[2])
+    min_C0, min_C1, _ = min_integral
 
     # Создаем новую фигуру и оси
     fig, ax = plt.subplots()
@@ -556,7 +559,8 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
     # Генерируем HTML-код для отображения картинки
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
-    return image_html, coefficients_with_integrals
+    return image_html, coefficients_with_integrals, min_C0, min_C1
+
 
 
 def calculate_integral(T1, T2, K, C0, C1, choise_plot_or_not=True):
@@ -604,7 +608,7 @@ def calculate_integral(T1, T2, K, C0, C1, choise_plot_or_not=True):
 
 def plot_response_pi_controller(t, y):
     # Создаем новую фигуру и оси
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(8, 5))
 
     # Строим график
     ax.plot(t, y, 'y')
@@ -938,15 +942,27 @@ def function_of_main_pi_page_first():
         m = -math.log(1 - y_value) / (2 * math.pi)
 
         image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
-        image_D_graph, coefficients_with_integrals = generate_system_response(k_value, T2_value, T1_value)
+        image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value)
+        t,y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
+        image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t,y)
+
+        first_calculation = (A2_value / A1_value) * 100
+        second_calculation = 1 - (A3_value / A1_value)
 
         return render_template('PI/PI_full_page.html',
                                image_transmission_funct=image_transmission_funct,
                                y_value=y_value,
                                m=round(m, 3),
                                image_D_graph=image_D_graph,
-                               coefficients_with_integrals=coefficients_with_integrals)
+                               coefficients_with_integrals=coefficients_with_integrals,
+                               min_C0=min_C0,
+                               min_C1=min_C1,
+                               image_transmission_funct_PI_controller=image_transmission_funct_PI_controller,
+                               A1_value=A1_value, A2_value=A2_value, A3_value=A3_value,
+                               t_M=A1_value, t_p=t_p,
+                               first_calculation=first_calculation, second_calculation=second_calculation)
 
     return render_template('PI/PI_full_page.html')
+
 
 app.run(debug=True)
