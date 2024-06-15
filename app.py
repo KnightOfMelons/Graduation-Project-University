@@ -965,4 +965,75 @@ def function_of_main_pi_page_first():
     return render_template('PI/PI_full_page.html')
 
 
+# ==================== Отдельная страница для передаточной функции объекта ===========================
+@app.route('/transfer_function_of_the_object', methods=['GET', 'POST'])
+def functuion_of_transfer_function_of_the_object():
+    if request.method == "POST":
+        T2_value = float(request.form['T2_value'])
+        T1_value = float(request.form['T1_value'])
+        t_value = float(request.form['t_value'])
+        k_value = float(request.form['k_value'])
+        y_value = float(request.form['y_value'])
+        stop_time = int(request.form['stop_time'])
+        m = -math.log(1 - y_value) / (2 * math.pi)
+
+        image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
+
+        return render_template('PI/Separate/transfer_function_of_the_object.html',
+                               image_transmission_funct=image_transmission_funct,
+                               y_value=y_value,
+                               m=round(m, 3))
+
+    return render_template('PI/Separate/transfer_function_of_the_object.html')
+
+
+# ==================== Отдельная страница для кривой равной степени колебательности ===================
+@app.route('/equal_degree_of_vibration_curve', methods=['GET','POST'])
+def function_of_equal_degree_of_vibration_curve():
+    if request.method == "POST":
+        T2_value = float(request.form['T2_value'])
+        T1_value = float(request.form['T1_value'])
+        t_value = float(request.form['t_value'])
+        k_value = float(request.form['k_value'])
+        y_value = float(request.form['y_value'])
+        stop_time = int(request.form['stop_time'])
+        m = -math.log(1 - y_value) / (2 * math.pi)
+
+        image_D_graph, coefficients_with_integrals, _, _ = generate_system_response(k_value, T2_value, T1_value)
+
+        return render_template('PI/PI_full_page.html',
+                               image_D_graph=image_D_graph,
+                               coefficients_with_integrals=coefficients_with_integrals,)
+
+    return render_template('PI/Separate/equal_degree_of_vibration_curve.html')
+
+
+# ==================== Отдельная страница для переходного процесса с использованием ПИ-регулятора ===================
+@app.route('/transient_process_using_a_PI_controller', methods=['GET', 'POST'])
+def function_of_transient_process_using_a_PI_controller():
+    if request.method == "POST":
+        T2_value = float(request.form['T2_value'])
+        T1_value = float(request.form['T1_value'])
+        t_value = float(request.form['t_value'])
+        k_value = float(request.form['k_value'])
+        y_value = float(request.form['y_value'])
+        stop_time = int(request.form['stop_time'])
+        m = -math.log(1 - y_value) / (2 * math.pi)
+
+        _, _, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value)
+        t,y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
+        image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t,y)
+
+        first_calculation = (A2_value / A1_value) * 100
+        second_calculation = 1 - (A3_value / A1_value)
+
+        return render_template('PI/Separate/transient_process_using_a_PI_controller.html',
+                               min_C0=min_C0,
+                               min_C1=min_C1,
+                               image_transmission_funct_PI_controller=image_transmission_funct_PI_controller,
+                               A1_value=A1_value, A2_value=A2_value, A3_value=A3_value,
+                               t_M=A1_value, t_p=t_p,
+                               first_calculation=first_calculation, second_calculation=second_calculation)
+
+    return render_template('PI/Separate/transient_process_using_a_PI_controller.html')
 app.run(debug=True)

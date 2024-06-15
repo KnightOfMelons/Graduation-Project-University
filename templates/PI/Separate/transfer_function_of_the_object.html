@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Передаточная функция объекта{% endblock %}
+
+{% block content %}
+<div class="container">
+        <h1 class="text-center mb-4">Введите исходные данные для построения передаточной функции:</h1>
+        <form method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="1712.0" required>
+                </div>
+
+                 <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T1_value" value="126.4" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">τ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t_value" value="30" required>
+                </div>
+
+                 <div class="col-auto my-2">
+                    <label class="form-label">k:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="k_value" value="22.9" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">ψ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="y_value" value="0.7" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Stop time:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="stop_time" value="2000" required>
+                </div>
+
+                <div class="text-center mb-3 my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить график">
+                </div>
+            </div>
+        </form>
+
+  {% if image_transmission_funct %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_transmission_funct | safe }}
+        </div>
+
+
+        <p class="text-center">Для полученной передаточной функции одним из точных методов рассчитали оптимальные
+            настроечные параметры ПИ-регулятора, обеспечивающие получения переходных процессов со степенью затухания
+            ψ, не ниже заданной. <b>(Ψ={{ y_value }})</b></p>
+
+        <p class="text-center">Для получения оптимальных настроек ПИ-регулятора воспользуемся методом расширенных
+            частотных характеристик</p>
+
+        <p class="text-center">Зная степень затухания, сможем определить степень колебательности:</p>
+        <div class="d-flex align-items-center justify-content-center my-3">
+            <img src="{{ url_for('static', filename='img/degree_of_oscillation.jpg') }}"
+                 class="img-fluid"
+                 style="width: 10%;"
+                 alt="Степень колебательности">
+            <span class="ms-3 fw-bold">= {{ m }}</span>
+        </div>
+  {% endif %}
+</div>
+{% endblock %}

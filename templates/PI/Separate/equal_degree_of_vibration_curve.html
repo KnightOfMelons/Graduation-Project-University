@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Кривая равной степени колебательности{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <h1 class="text-center mb-4">Введите данные для построения кривой равной степени колебательности:</h1>
+        <form method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="1712.0" required>
+                </div>
+
+                 <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T1_value" value="126.4" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">τ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t_value" value="30" required>
+                </div>
+
+                 <div class="col-auto my-2">
+                    <label class="form-label">k:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="k_value" value="22.9" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">ψ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="y_value" value="0.7" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Stop time:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="stop_time" value="2000" required>
+                </div>
+
+                <div class="text-center mb-3 my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить график">
+                </div>
+            </div>
+        </form>
+
+        {% if image_D_graph %}
+        <p class="text-center">Получим следующий график D-разбиения, по которому будем определять параметры регулятора:</p>
+        <div class="d-flex justify-content-center my-4">
+            {{ image_D_graph | safe }}
+        </div>
+
+        <div class="text-center">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Значение параметра настройки C0</th>
+                        <th>Значение параметра настройки C1</th>
+                        <th>Интегральный критерий качества I</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for c0, c1, i in coefficients_with_integrals %}
+                    <tr>
+                        <td>{{ "%.6f"|format(c0|float) }}</td>
+                        <td>{{ "%.6f"|format(c1|float) }}</td>
+                        <td>{{ "%.3f"|format(i|float) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

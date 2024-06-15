@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Переходный процесс с использованием регулятора{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <h1 class="text-center mb-4">Введите исходные данные для построения переходного процесса:</h1>
+        <form method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="1712.0" required>
+                </div>
+
+                 <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="T1_value" value="126.4" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">τ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t_value" value="30" required>
+                </div>
+
+                 <div class="col-auto my-2">
+                    <label class="form-label">k:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="k_value" value="22.9" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">ψ:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="y_value" value="0.7" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Stop time:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="stop_time" value="2000" required>
+                </div>
+
+                <div class="text-center mb-3 my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить график">
+                </div>
+            </div>
+        </form>
+
+                <div class="text-center">
+                    {% if image_transmission_funct_PI_controller %}
+                        <p class="text-center">За оптимальные настройки регулятора примем:</p>
+                        <p>C0 = <b>{{ "%.6f"|format(min_C0|float) }}</b><br>C1 = <b>{{ "%.6f"|format(min_C1|float) }}</b></p>
+
+                        <div class="text-center">
+                                {{ image_transmission_funct_PI_controller | safe }}
+                        </div>
+
+
+                        <div class="text-center">
+                            <p>Оценим качество переходного процесса </p>
+                            <p>Колебательность равняется:</p>
+                            <img src="{{ url_for('static', filename='img/colebatelnost.jpg') }}" class="img-fluid mb-2" style="width: 15%;"> {{ first_calculation | round(2)  }} %
+                            <p>Степень затухания:</p>
+                            <img src="{{ url_for('static', filename='img/stepen_zatuhania.jpg') }}" style="width: 15%;">{{ second_calculation | round(2) }}
+                            <p>Длительность переходного процесса <b>t_п = {{ t_p | int }}</b></p>
+                            <p>Время достижения первого максимума <b>t_М = {{ t_M | int }}</b></p>
+                        </div>
+
+                    {% endif %}
+                </div>
+    </div>
+
+{% endblock %}
