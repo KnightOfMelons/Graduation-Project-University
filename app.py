@@ -1014,13 +1014,12 @@ def function_of_transient_process_using_a_PI_controller():
     if request.method == "POST":
         T2_value = float(request.form['T2_value'])
         T1_value = float(request.form['T1_value'])
-        t_value = float(request.form['t_value'])
         k_value = float(request.form['k_value'])
-        y_value = float(request.form['y_value'])
-        stop_time = int(request.form['stop_time'])
-        m = -math.log(1 - y_value) / (2 * math.pi)
+        min_C0 = float(request.form['min_C0'])
+        min_C1 = float(request.form['min_C1'])
 
-        _, _, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value)
+        # _, _, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value)
+        # print(min_C0,min_C1)
         t,y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
         image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t,y)
 
