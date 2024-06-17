@@ -654,6 +654,106 @@ def acceleration_curve(x_values, y_values, name):
 
     return image_impulse
 
+
+def find_first_positive_value_in_list(x_values, y_values):
+    for i in range(len(y_values)):
+        if y_values[i] > 0:
+            return x_values[i - 1] if i > 0 else None
+    return None
+
+
+def plot_complex_frequency_response(k, t2, t1, first_x_value, name_complex):
+    # Создаем массив частот
+    w = np.linspace(0, 0.5, 1000)
+    p = 1j * w
+
+    # Вычисляем комплексно-частотную характеристику
+    W = k / (t2 * p ** 2 + t1 * p + 1) * np.exp(-first_x_value * p)
+
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график с учетом реальной и мнимой частей
+    ax.plot(W.real, W.imag)
+    ax.set_title(f'Комплексно-частотная характеристика по каналу {name_complex}')
+    ax.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_impulse
+
+
+def plot_amplitude_frequency_response(k, t2, t1, first_x_value, name_complex):
+    # Создаем массив частот
+    w = np.linspace(0, 0.2, 200)
+    p = 1j * w
+
+    # Вычисляем амплитудно-частотную характеристику
+    W = k / (t2 * p ** 2 + t1 * p + 1) * np.exp(-first_x_value * p)
+
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график амплитудно-частотной характеристики
+    ax.plot(w, np.abs(W))
+    ax.set_title(f'Амплитудно-частотная характеристика по каналу {name_complex}')
+    ax.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_impulse
+
+
+def plot_phase_frequency_response(k, t2, t1, first_x_value, name_complex):
+    # Создаем массив частот
+    w = np.linspace(0, 0.01, 1000)
+    p = 1j * w
+
+    # Вычисляем фазо-частотную характеристику
+    W = k / (t2 * p ** 2 + t1 * p + 1) * np.exp(-first_x_value * p)
+
+    # Вычисляем фазу и преобразуем в градусы
+    phase = np.unwrap(np.angle(W) * 90 / np.pi)
+
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график фазо-частотной характеристики
+    ax.plot(w, phase)
+    ax.set_title(f'Фазо-частотная характеристика по каналу {name_complex}')
+    ax.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_impulse
+
 # ======================================================================================================
 # =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
 # ======================================================================================================
@@ -1086,11 +1186,56 @@ def function_of_combined_system_first_page():
         t1_1, t2_1, t3_1, input_K_1, _, _, _, _, _ = simou_method(np.array(y_values_1), np.array(x_values_1), input_K)
         t1_2, t2_2, t3_2, input_K_2, _, _, _, _, _ = simou_method(np.array(y_values_2), np.array(x_values_2), input_K)
 
+        first_x_value_1 = find_first_positive_value_in_list(x_values_1, y_values_1)
+        first_x_value_2 = find_first_positive_value_in_list(x_values_2, y_values_2)
+
+        print(f'Первые значения: {input_K_1, t2_1, t1_1, first_x_value_1}')
+        print(f'Вторые значения: {input_K_2, t2_2, t1_2, first_x_value_2}')
+
+        image_complex_control = plot_complex_frequency_response(input_K_1,
+                                                                t2_1,
+                                                                t1_1,
+                                                                first_x_value_1,
+                                                                'управления.')
+        image_complex_disturbance = plot_complex_frequency_response(input_K_2,
+                                                                    t2_2,
+                                                                    t1_2,
+                                                                    first_x_value_2,
+                                                                    'возмущения.')
+
+        image_amplitude_control = plot_amplitude_frequency_response(input_K_1,
+                                                                    t2_1,
+                                                                    t1_1,
+                                                                    first_x_value_1,
+                                                                    'управления.')
+        image_amplitude_disturbance = plot_amplitude_frequency_response(input_K_2,
+                                                                    t2_2,
+                                                                    t1_2,
+                                                                    first_x_value_2,
+                                                                    'возмущения.')
+
+        image_phase_frequency_response_control = plot_phase_frequency_response(input_K_1,
+                                                                    t2_1,
+                                                                    t1_1,
+                                                                    first_x_value_1,
+                                                                    'управления.')
+        image_phase_frequency_response_disturbance = plot_phase_frequency_response(input_K_2,
+                                                                    t2_2,
+                                                                    t1_2,
+                                                                    first_x_value_2,
+                                                                    'возмущения.')
+
         return render_template('Combined/combined_system_1.html',
                                acceleration_curve_control=acceleration_curve_control,
                                acceleration_curve_disturbance=acceleration_curve_disturbance,
                                simou_method_control=[round(t1_1, 3), round(t2_1, 3), round(t3_1, 3), input_K_1],
-                               simou_method_disturbance=[round(t1_2, 3), round(t2_2, 3), round(t3_2, 3), input_K_2]
+                               simou_method_disturbance=[round(t1_2, 3), round(t2_2, 3), round(t3_2, 3), input_K_2],
+                               image_complex_control=image_complex_control,
+                               image_complex_disturbance=image_complex_disturbance,
+                               image_amplitude_control=image_amplitude_control,
+                               image_amplitude_disturbance=image_amplitude_disturbance,
+                               image_phase_frequency_response_control=image_phase_frequency_response_control,
+                               image_phase_frequency_response_disturbance=image_phase_frequency_response_disturbance,
                                )
 
     return render_template('Combined/combined_system_1.html')

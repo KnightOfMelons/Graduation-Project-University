@@ -258,6 +258,34 @@
         </div>
     {% endif %}
 
+    {% if image_complex_control %}
+    <h5 class="text-center mt-3">Частотные характеристики объекта управления.</h5>
+    <p class="text-center">Частотные характеристики объекта по каналу управления приведены на рисунках снизу.</p>
+        {{ image_complex_control | safe }}
+    {% endif %}
+
+    {% if image_complex_disturbance %}
+        {{ image_complex_disturbance | safe }}
+    {% endif %}
+
+    <br>
+
+    {% if image_amplitude_control %}
+        {{ image_amplitude_control | safe}}
+    {% endif %}
+
+    {% if image_amplitude_disturbance %}
+        {{ image_amplitude_disturbance | safe}}
+    {% endif %}
+
+    {% if image_phase_frequency_response_control %}
+        {{ image_phase_frequency_response_control | safe}}
+    {% endif %}
+
+    {% if image_phase_frequency_response_disturbance %}
+        {{ image_phase_frequency_response_disturbance | safe}}
+    {% endif %}
+
     <div class="row justify-content-center mt-3 mb-3">
         <div class="col-auto">
             <a href="#"><button type="button" class="btn btn-primary">Следующая часть</button></a>
