@@ -499,12 +499,12 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
     p = -m * w + 1j * w  # комплексная частота
 
     # Задаем ПФ объекта
-    Wo = k / (T2 * p**2 + T1 * p + 1) * np.exp(-30 * p)  # задаем ПФ
+    Wo = k / (T2 * p ** 2 + T1 * p + 1) * np.exp(-30 * p)  # задаем ПФ
 
     # инверсная ПФ
     W1 = 1 / Wo
 
-    C0 = w * (1 + m**2) * np.imag(W1)
+    C0 = w * (1 + m ** 2) * np.imag(W1)
     C1 = -np.real(W1) + m * np.imag(W1)
 
     # Ограничение области графика
@@ -562,7 +562,6 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4):
     return image_html, coefficients_with_integrals, min_C0, min_C1
 
 
-
 def calculate_integral(T1, T2, K, C0, C1, choise_plot_or_not=True):
     # Параметры системы
     numerator = [1]
@@ -603,7 +602,7 @@ def calculate_integral(T1, T2, K, C0, C1, choise_plot_or_not=True):
     if choise_plot_or_not == True:
         return integral
     else:
-        return t,y
+        return t, y
 
 
 def plot_response_pi_controller(t, y):
@@ -629,6 +628,32 @@ def plot_response_pi_controller(t, y):
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
     return image_html
+
+
+def acceleration_curve(x_values, y_values, name):
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график
+    ax.plot(x_values, y_values)
+    ax.set_title(f'{name}')
+    ax.set_xlabel('t, сек')
+    ax.set_ylabel('∆Q, %')
+    ax.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_impulse
+
 # ======================================================================================================
 # =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
 # ======================================================================================================
@@ -942,9 +967,10 @@ def function_of_main_pi_page_first():
         m = -math.log(1 - y_value) / (2 * math.pi)
 
         image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
-        image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value)
-        t,y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
-        image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t,y)
+        image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value,
+                                                                                              T1_value)
+        t, y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
+        image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
 
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
@@ -988,7 +1014,7 @@ def functuion_of_transfer_function_of_the_object():
 
 
 # ==================== Отдельная страница для кривой равной степени колебательности ===================
-@app.route('/equal_degree_of_vibration_curve', methods=['GET','POST'])
+@app.route('/equal_degree_of_vibration_curve', methods=['GET', 'POST'])
 def function_of_equal_degree_of_vibration_curve():
     if request.method == "POST":
         T2_value = float(request.form['T2_value'])
@@ -997,18 +1023,17 @@ def function_of_equal_degree_of_vibration_curve():
         k_value = float(request.form['k_value'])
         y_value = float(request.form['y_value'])
         stop_time = int(request.form['stop_time'])
-        m = -math.log(1 - y_value) / (2 * math.pi)
 
         image_D_graph, coefficients_with_integrals, _, _ = generate_system_response(k_value, T2_value, T1_value)
 
         return render_template('PI/PI_full_page.html',
                                image_D_graph=image_D_graph,
-                               coefficients_with_integrals=coefficients_with_integrals,)
+                               coefficients_with_integrals=coefficients_with_integrals, )
 
     return render_template('PI/Separate/equal_degree_of_vibration_curve.html')
 
 
-# ==================== Отдельная страница для переходного процесса с использованием ПИ-регулятора ===================
+# ==================== Отдельная страница для переходного процесса с использованием ПИ-регулятора =====
 @app.route('/transient_process_using_a_PI_controller', methods=['GET', 'POST'])
 def function_of_transient_process_using_a_PI_controller():
     if request.method == "POST":
@@ -1018,10 +1043,8 @@ def function_of_transient_process_using_a_PI_controller():
         min_C0 = float(request.form['min_C0'])
         min_C1 = float(request.form['min_C1'])
 
-        # _, _, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value)
-        # print(min_C0,min_C1)
-        t,y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
-        image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t,y)
+        t, y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
+        image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
 
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
@@ -1035,4 +1058,41 @@ def function_of_transient_process_using_a_PI_controller():
                                first_calculation=first_calculation, second_calculation=second_calculation)
 
     return render_template('PI/Separate/transient_process_using_a_PI_controller.html')
+
+
+# ======================================================================================================
+# =========== Расчёт комбинированной системы регулирования процесса горения в топке котла ==============
+# ======================================================================================================
+
+@app.route('/combined_system_1', methods=['GET','POST'])
+def function_of_combined_system_first_page():
+    if request.method == "POST":
+        # Сбор данных по каналу управления
+        x_values_1 = [float(request.form[f"xValues_{i}"]) for i in range(13)]
+        y_values_1 = [float(request.form[f"yValues_{i}"]) for i in range(13)]
+
+        # Сбор данных по каналу возмущения
+        x_values_2 = [float(request.form[f"xValues_2_{i}"]) for i in range(13)]
+        y_values_2 = [float(request.form[f"yValues_2_{i}"]) for i in range(13)]
+
+        # Коэффициент усиления для расчёта метода Симою
+        input_K = int(request.form['k'])
+
+        # Кривые разгона для управления и возмущения
+        acceleration_curve_control = acceleration_curve(x_values_1, y_values_1, 'Кривая разгона по каналу управления')
+        acceleration_curve_disturbance = acceleration_curve(x_values_2, y_values_2, 'Кривая разгона по каналу возмущения')
+
+        # Расчёт метода симою для управления и возмущения
+        t1_1, t2_1, t3_1, input_K_1, _, _, _, _, _ = simou_method(np.array(y_values_1), np.array(x_values_1), input_K)
+        t1_2, t2_2, t3_2, input_K_2, _, _, _, _, _ = simou_method(np.array(y_values_2), np.array(x_values_2), input_K)
+
+        return render_template('Combined/combined_system_1.html',
+                               acceleration_curve_control=acceleration_curve_control,
+                               acceleration_curve_disturbance=acceleration_curve_disturbance,
+                               simou_method_control=[round(t1_1, 3), round(t2_1, 3), round(t3_1, 3), input_K_1],
+                               simou_method_disturbance=[round(t1_2, 3), round(t2_2, 3), round(t3_2, 3), input_K_2]
+                               )
+
+    return render_template('Combined/combined_system_1.html')
+
 app.run(debug=True)

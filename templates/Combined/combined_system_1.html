@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Комбинированная система процесса горения в топке ч.1{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Расчет комбинированной системы автоматического регулирования процесса горения в топке котла.</h2>
+    <form action="/combined_system_1" method="POST">
+            <div class="row justify-content-center">
+                <h4 class="text-center mb-4">Введите данные для кривой разгона по каналу управления:</h4>
+                <div class="col-auto my-2">
+                    <label class="form-label">t, сек:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_0" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_1" value="10" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_3" value="30" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_4" value="40" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_5" value="50" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_6" value="60" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_7" value="70" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_8" value="80" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_9" value="90" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_10" value="100" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_11" value="110" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_12" value="120" required>
+                </div>
+            </div>
+
+
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">∆Q, %:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_0" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_1" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_2" value="1.75" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_3" value="7.5" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_4" value="15" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_5" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_6" value="23" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_7" value="24.5" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_8" value="25" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_9" value="25" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_10" value="25" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_11" value="25" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="yValues_12" value="25" required>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row justify-content-center">
+                <h4 class="text-center mb-4">Введите данные для кривой разгона по каналу возмущения:</h4>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">t, сек:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_0" value="0" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_1" value="10" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_2" value="20" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_3" value="30" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_4" value="40" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_5" value="50" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_6" value="60" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_7" value="70" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_8" value="80" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_9" value="90" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_10" value="100" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_11" value="110" required>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="xValues_2_12" value="120" required>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                    <div class="col-auto my-2">
+                        <label class="form-label">∆Q, %:</label>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_0" value="0" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_1" value="0" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_2" value="0" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_3" value="0" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_4" value="0.5" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_5" value="1.9" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_6" value="4" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_7" value="5.07" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_8" value="5.72" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_9" value="5.98" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_10" value="6" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_11" value="6" required>
+                    </div>
+                    <div class="col-auto my-2">
+                        <input type="text" class="form-control input-field-for-PID" name="yValues_2_12" value="6" required>
+                    </div>
+                </div>
+
+            <hr class="my-4">
+
+            <div class="row justify-content-center">
+                <div class="col-md-1 my-2">
+                    <label class="form-label">Входной сигнал:</label>
+                    <input type="text" class="form-control input-field-for-SIMOU" name="k" value="20" required>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="text-center mb-3 my-2">
+                <input type="submit" class="btn btn-primary" value="Построить график">
+            </div>
+        </form>
+
+    {% if acceleration_curve_control %}
+        <p class="text-center">Кривая разгона по каналу управления (изменение содержания кислорода в дымовых газах
+        при изменении положения шибера в воздушной линии на 20%) приведена ниже.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ acceleration_curve_control | safe }}
+        </div>
+    {% endif %}
+
+    {% if acceleration_curve_disturbance %}
+        <p class="text-center">Кривая разгона по каналу возмущения (изменение содержания кислорода в дымовых газах
+            при увеличении расхода топливного газа на 20%) приведена ниже.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ acceleration_curve_disturbance | safe }}
+        </div>
+    {% endif %}
+
+    {% if simou_method_control %}
+    <p class="text-center">По кривым разгона методом Симою получены передаточные функции по каналу регулирования.</p>
+        <div class="row justify-content-center mt-2">
+            <div class="col-auto text-center">
+                <div class="mb-4 mt-4">
+                    W(s) = {{ simou_method_control[3] }}
+                </div>
+            </div>
+            <div class="col-auto text-center mb-2">
+                <div>1</div>
+                <div class="mb-2"><hr></div>
+                <div>{{ simou_method_control[1] }}*s^2 + {{ simou_method_control[0] }}*s + 1</div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if simou_method_disturbance %}
+    <p class="text-center">Аналогично получена передаточная функция по каналу возмущения.</p>
+        <div class="row justify-content-center mt-2">
+            <div class="col-auto text-center">
+                <div class="mb-4 mt-4">
+                    W(s) = {{ simou_method_disturbance[3] }}
+                </div>
+            </div>
+            <div class="col-auto text-center">
+                <div>1</div>
+                <div class="mb-2"><hr></div>
+                <div>{{ simou_method_disturbance[1] }}*s^2 + {{ simou_method_disturbance[0] }}*s + 1</div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row justify-content-center mt-3 mb-3">
+        <div class="col-auto">
+            <a href="#"><button type="button" class="btn btn-primary">Следующая часть</button></a>
+        </div>
+    </div>
+</div>
+{% endblock %}
