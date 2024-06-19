@@ -16,6 +16,11 @@ def main_page():
     return render_template('index.html')
 
 
+@app.route('/kvgm100')
+def function_of_kvgm_info_page():
+    return render_template('kvgm-100.html')
+
+
 def transient_process_using_a_regulator(T1, T2, K, C0, C1, C2):
     # Параметры системы
     numerator = [1]
@@ -1374,6 +1379,7 @@ def function_of_combined_system_second_page():
         stop_time = float(request.form['stop_time'])
         m = float(request.form['m'])
 
+        # Тут был код для реализации по возмущению, но не получается расчёт (график строится не так)
         # k_2 = float(request.form['k_2'])
         # t1_2 = float(request.form['t1_value_2'])
         # t2_2 = float(request.form['t2_value_2'])
