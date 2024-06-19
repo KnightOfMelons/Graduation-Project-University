@@ -754,6 +754,120 @@ def plot_phase_frequency_response(k, t2, t1, first_x_value, name_complex):
 
     return image_impulse
 
+
+def plot_equal_degree_of_oscillation_curve(T2, T1, k, first_x_value, m):
+    # Создаем массив частот
+    w = np.arange(0, 0.0601, 0.0001)
+    p = (1j - m) * w
+
+    # Вычисляем W
+    W = (T2 * p ** 2 + T1 * p + 1) / (k * np.exp(-first_x_value * p))
+
+    # Вычисляем реальную и мнимую части W
+    R = np.real(W)
+    M = np.imag(W)
+
+    # Вычисляем C0 и C1
+    C0 = M * w * (m ** 2 + 1)
+    C1 = m * M - R
+
+    # Находим индекс максимума C0
+    max_index = np.argmax(C0)
+
+    # Собираем значения C1 и C0 начиная с максимума
+    step = 30  # Уменьшаем шаг для выбора точек на 30% от исходного значения
+    C1_right = C1[max_index + 1::step][:5]
+    C0_right = C0[max_index + 1::step][:5]
+
+    points = list(zip(C1_right, C0_right))
+
+    # Создаем новую фигуру и оси
+    fig, ax = plt.subplots()
+
+    # Строим график
+    ax.plot(C1, C0)
+    ax.plot(C1_right, C0_right, 'ro')  # Отмечаем 5 точек красными точками
+    ax.set_title('Кривая равной степени колебательности')
+    ax.grid(True)
+
+    # Сохраняем график в буфер
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # Кодируем буфер в base64 строку
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # Генерируем HTML-код для отображения картинки
+    image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    return image_impulse, points
+
+
+def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time, constant_num, plot_build=True):
+    # Определение передаточной функции системы
+    num = [k]
+    den = [t2, t1, 1]
+    system = ctl.TransferFunction(num, den)
+
+    # Параметры ПИ-регулятора
+    Kp = C1
+    Ki = C2
+    PI_controller = ctl.TransferFunction([Kp, Ki], [1, 0])
+
+    # Элемент Constant4
+    constant_value = constant_num
+
+    # Замкнутая система с обратной связью и добавленным элементом Constant4
+    open_loop_system = PI_controller * system
+    closed_loop_system = ctl.feedback(open_loop_system)
+    closed_loop_with_constant = ctl.series(constant_value, closed_loop_system)
+
+    # Моделирование реакции системы на единичный скачок
+    time = np.linspace(0, stop_time, 1000)
+    t, response = ctl.step_response(closed_loop_with_constant, T=time)
+
+    # Учёт транспортного запаздывания
+    delay_time = 10
+    response_delayed = np.zeros_like(response)
+    delay_samples = int(delay_time / (time[1] - time[0]))
+    response_delayed[delay_samples:] = response[:-delay_samples]
+
+    if plot_build == True:
+        # Построение графика
+        fig, ax = plt.subplots()
+        ax.plot(t, response_delayed, label='Response')
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Response')
+        ax.set_title('Step Response with Transport Delay')
+        ax.grid(True)
+        ax.legend()
+
+        # Сохраняем график в буфер
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        plt.close(fig)
+
+        # Кодируем буфер в base64 строку
+        image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+        # Генерируем HTML-код для отображения картинки
+        image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+        return image_html
+    else:
+        # Вычисление значения интегратора
+        integrator = ctl.TransferFunction([1], [1, 0])
+        response_squared = response_delayed ** 2
+        integrated_response = ctl.forced_response(integrator, T=time, U=response_squared)[1]
+
+        # Получение значения из блока Display
+        display_value = integrated_response[-1]
+
+        return display_value
+
+
 # ======================================================================================================
 # =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
 # ======================================================================================================
@@ -1033,7 +1147,6 @@ def function_of_most_identical_transient_process():
 # ======================================================================================================
 # ========================================== Метод Симою ===============================================
 # ======================================================================================================
-
 @app.route('/SIMOU', methods=["GET", "POST"])
 def method_simou():
     if request.method == "POST":
@@ -1189,9 +1302,6 @@ def function_of_combined_system_first_page():
         first_x_value_1 = find_first_positive_value_in_list(x_values_1, y_values_1)
         first_x_value_2 = find_first_positive_value_in_list(x_values_2, y_values_2)
 
-        print(f'Первые значения: {input_K_1, t2_1, t1_1, first_x_value_1}')
-        print(f'Вторые значения: {input_K_2, t2_2, t1_2, first_x_value_2}')
-
         image_complex_control = plot_complex_frequency_response(input_K_1,
                                                                 t2_1,
                                                                 t1_1,
@@ -1239,5 +1349,31 @@ def function_of_combined_system_first_page():
                                )
 
     return render_template('Combined/combined_system_1.html')
+
+
+@app.route('/combined_system_2', methods=['GET','POST'])
+def function_of_combined_system_second_page():
+    if request.method == "POST":
+        k = float(request.form['k'])
+        t1 = float(request.form['t1_value'])
+        t2 = float(request.form['t2_value'])
+        first_x_value = float(request.form['first_x_value'])
+        stop_time = float(request.form['stop_time'])
+        m = float(request.form['m'])
+
+        image_equal_oscillation_curve, points = plot_equal_degree_of_oscillation_curve(t2, t1, k, first_x_value, m)
+
+        results = []
+        for C1, C2 in points:
+            display_value = plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time,
+                                                                    constant_num=1,
+                                                                    plot_build=False)
+            results.append((C1, C2, display_value))
+
+        return render_template('Combined/combined_system_2.html',
+                               image_equal_oscillation_curve=image_equal_oscillation_curve,
+                               results=results)
+
+    return render_template('Combined/combined_system_2.html')
 
 app.run(debug=True)

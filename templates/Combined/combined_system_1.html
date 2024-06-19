@@ -204,7 +204,7 @@
             <hr class="my-4">
 
             <div class="text-center mb-3 my-2">
-                <input type="submit" class="btn btn-primary" value="Построить график">
+                <input type="submit" class="btn btn-primary" value="Рассчитать">
             </div>
         </form>
 
@@ -259,36 +259,54 @@
     {% endif %}
 
     {% if image_complex_control %}
-    <h5 class="text-center mt-3">Частотные характеристики объекта управления.</h5>
-    <p class="text-center">Частотные характеристики объекта по каналу управления приведены на рисунках снизу.</p>
-        {{ image_complex_control | safe }}
-    {% endif %}
+        <h5 class="text-center mt-3">Частотные характеристики объекта управления.</h5>
+        <p class="text-center">Частотные характеристики объекта по каналу управления приведены на рисунках снизу.</p>
 
-    {% if image_complex_disturbance %}
-        {{ image_complex_disturbance | safe }}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_complex_control | safe }}
+        </div>
     {% endif %}
-
-    <br>
 
     {% if image_amplitude_control %}
-        {{ image_amplitude_control | safe}}
-    {% endif %}
-
-    {% if image_amplitude_disturbance %}
-        {{ image_amplitude_disturbance | safe}}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_amplitude_control | safe}}
+        </div>
     {% endif %}
 
     {% if image_phase_frequency_response_control %}
-        {{ image_phase_frequency_response_control | safe}}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_phase_frequency_response_control | safe}}
+        </div>
     {% endif %}
+
+    {% if image_complex_disturbance %}
+        <p class="text-center">Частотные характеристики объекта по каналу возмущения приведены на рисунках снизу.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ image_complex_disturbance | safe }}
+        </div>
+    {% endif %}
+
+
+
+
+    {% if image_amplitude_disturbance %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_amplitude_disturbance | safe}}
+        </div>
+    {% endif %}
+
+
 
     {% if image_phase_frequency_response_disturbance %}
-        {{ image_phase_frequency_response_disturbance | safe}}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_phase_frequency_response_disturbance | safe}}
+        </div>
     {% endif %}
 
-    <div class="row justify-content-center mt-3 mb-3">
+    <div class="row justify-content-center mb-3">
         <div class="col-auto">
-            <a href="#"><button type="button" class="btn btn-primary">Следующая часть</button></a>
+            <a href="/combined_system_2"><button type="button" class="btn btn-primary">Следующая часть</button></a>
         </div>
     </div>
 </div>

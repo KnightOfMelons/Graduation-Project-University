@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Комбинированная система процесса горения в топке ч.2{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-4">Введите данные с прошлой страницы:</h1>
+    <form action="/combined_system_2" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_value" value="38.3" style="width: 5rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t2_value" value="648.89" style="width: 5rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Колебательность:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="m" value="0.3" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Запаздывание:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="first_x_value" value="10" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Коэффициент усиления:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="k" value="1.25" style="width: 4rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Stop time:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="stop_time" value="600" style="width: 4rem;" required>
+                </div>
+
+                <div class="text-center my-2">
+                    <input type="submit" class="btn btn-primary" value="Построить">
+                </div>
+            </div>
+        </form>
+
+    {% if image_equal_oscillation_curve %}
+        <p class="text-center">Построим график зависимости C0(C1) и определяем из него C1 и C0 следующим образом:
+        находим на кривой точку максимума и выбираем точки правее него.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ image_equal_oscillation_curve | safe }}
+        </div>
+
+            <div class="text-center">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Значение параметра настройки C1</th>
+                            <th>Значение параметра настройки C0</th>
+                            <th>Интегральный критерий качества I</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for c1, c0, i in results %}
+                        <tr>
+                            <td>{{ "%.6f"|format(c1|float) }}</td>
+                            <td>{{ "%.6f"|format(c0|float) }}</td>
+                            <td>{{ "%.2f"|format(i|float) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    {% endif %}
+
+
+</div>
+{% endblock %}
