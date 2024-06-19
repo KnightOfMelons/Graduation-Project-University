@@ -804,7 +804,11 @@ def plot_equal_degree_of_oscillation_curve(T2, T1, k, first_x_value, m):
     return image_impulse, points
 
 
-def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time, constant_num, plot_build=True):
+def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time,
+                                            constant_num,
+                                            plot_build=True,
+                                            delay_time=10,
+                                            name_plot='Переходный процесс в одноконтурной системе.'):
     # Определение передаточной функции системы
     num = [k]
     den = [t2, t1, 1]
@@ -828,18 +832,25 @@ def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time, consta
     t, response = ctl.step_response(closed_loop_with_constant, T=time)
 
     # Учёт транспортного запаздывания
-    delay_time = 10
     response_delayed = np.zeros_like(response)
     delay_samples = int(delay_time / (time[1] - time[0]))
     response_delayed[delay_samples:] = response[:-delay_samples]
 
     if plot_build == True:
+        # Вычисление значения интегратора
+        integrator = ctl.TransferFunction([1], [1, 0])
+        response_squared = response_delayed ** 2
+        integrated_response = ctl.forced_response(integrator, T=time, U=response_squared)[1]
+
+        # Получение значения из блока Display
+        display_value = integrated_response[-1]
+
+        return display_value
+    else:
         # Построение графика
         fig, ax = plt.subplots()
-        ax.plot(t, response_delayed, label='Response')
-        ax.set_xlabel('Time (s)')
-        ax.set_ylabel('Response')
-        ax.set_title('Step Response with Transport Delay')
+        ax.plot(t, response_delayed)
+        ax.set_title(f'{name_plot}')
         ax.grid(True)
         ax.legend()
 
@@ -856,17 +867,19 @@ def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time, consta
         image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
         return image_html
-    else:
-        # Вычисление значения интегратора
-        integrator = ctl.TransferFunction([1], [1, 0])
-        response_squared = response_delayed ** 2
-        integrated_response = ctl.forced_response(integrator, T=time, U=response_squared)[1]
 
-        # Получение значения из блока Display
-        display_value = integrated_response[-1]
 
-        return display_value
-
+def find_min_integrated_response(results):
+    # Поиск минимального значения интегратора
+    min_value = float('inf')
+    min_c1 = None
+    min_c2 = None
+    for C1, C2, I in results:
+        if I < min_value:
+            min_value = I
+            min_c1 = C1
+            min_c2 = C2
+    return min_c1, min_c2, min_value
 
 # ======================================================================================================
 # =============== Одноконтурная АСР с ПИД-регулятором и всё, что к ней относится =======================
@@ -1354,25 +1367,56 @@ def function_of_combined_system_first_page():
 @app.route('/combined_system_2', methods=['GET','POST'])
 def function_of_combined_system_second_page():
     if request.method == "POST":
-        k = float(request.form['k'])
-        t1 = float(request.form['t1_value'])
-        t2 = float(request.form['t2_value'])
-        first_x_value = float(request.form['first_x_value'])
+        k_1 = float(request.form['k'])
+        t1_1 = float(request.form['t1_value'])
+        t2_1 = float(request.form['t2_value'])
+        first_x_value_1 = float(request.form['first_x_value'])
         stop_time = float(request.form['stop_time'])
         m = float(request.form['m'])
 
-        image_equal_oscillation_curve, points = plot_equal_degree_of_oscillation_curve(t2, t1, k, first_x_value, m)
+        # k_2 = float(request.form['k_2'])
+        # t1_2 = float(request.form['t1_value_2'])
+        # t2_2 = float(request.form['t2_value_2'])
+        # first_x_value_2 = float(request.form['first_x_value_2'])
 
-        results = []
-        for C1, C2 in points:
-            display_value = plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time,
+        image_equal_oscillation_curve_1, points_1 = plot_equal_degree_of_oscillation_curve(t2_1, t1_1, k_1, first_x_value_1, m)
+        results_1 = []
+        for C1, C2 in points_1:
+            display_value = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, C1, C2, stop_time,
                                                                     constant_num=1,
-                                                                    plot_build=False)
-            results.append((C1, C2, display_value))
+                                                                    plot_build=True)
+            results_1.append((C1, C2, display_value))
+        min_c1_1, min_c2_1, min_value_1 = find_min_integrated_response(results_1)
+        image_transient_process_control_1 = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, min_c1_1, min_c2_1,
+                                                                                  constant_num=20,
+                                                                                  plot_build=False,
+                                                                                  stop_time=600,
+                                                                                  delay_time=20,
+                                                                                  name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
+
+
+        # image_equal_oscillation_curve_2, points_2 = plot_equal_degree_of_oscillation_curve(t2_2, t1_2, k_2, first_x_value_2, m)
+        # results_2 = []
+        # for C1, C2 in points_2:
+        #     display_value = plot_step_response_with_transport_delay(k_2, t2_2, t1_2, C1, C2, stop_time,
+        #                                                             constant_num=1,
+        #                                                             plot_build=True)
+        #     results_2.append((C1, C2, display_value))
+        # min_c1_2, min_c2_2, min_value_2 = find_min_integrated_response(results_2)
+        # image_transient_process_control_2 = plot_step_response_with_transport_delay(k_2, t2_2, t1_2, min_c1_2, min_c2_2,
+        #                                                                           constant_num=20,
+        #                                                                           plot_build=False,
+        #                                                                           stop_time=600,
+        #                                                                           delay_time=20,
+        #                                                                           name_plot='Переходный процесс в одноконтурной по возмущающему возд-вию.')
 
         return render_template('Combined/combined_system_2.html',
-                               image_equal_oscillation_curve=image_equal_oscillation_curve,
-                               results=results)
+                               image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
+                               results_1=results_1,
+                               min_c1_1=min_c1_1,
+                               min_c2_1=min_c2_1,
+                               min_value_1=min_value_1,
+                               image_transient_process_control_1=image_transient_process_control_1,)
 
     return render_template('Combined/combined_system_2.html')
 
