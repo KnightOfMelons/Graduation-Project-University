@@ -171,7 +171,8 @@ def compute_and_plot(T1, T2, K, C2):
     max_Ki = Ki[max_Kp_index]
 
     # Определить точки C0 и C1 на определенных процентных уровнях от максимального значения Kp
-    percentage_levels = [0.95, 0.9, 0.85, 0.8]  # Процентные уровни для нахождения точек
+    percentage_levels = [0.992, 0.987, 0.98664, 0.991234]  # Процентные уровни для нахождения точек НОВЫЕ, МОИ
+    # percentage_levels = [0.95, 0.9, 0.85, 0.8]  # Процентные уровни для нахождения точек ИЗНАЧАЛЬНЫЕ, КАКИЕ БЫЛИ
     C0_values = []
     C1_values = []
 
@@ -185,6 +186,7 @@ def compute_and_plot(T1, T2, K, C2):
     # Plot the results
     fig, ax = plt.subplots()
     ax.plot(Kp, Ki, label=f'C2 = {C2}')
+    ax.scatter(C0_values,C1_values, color='red', label='Выбранные точки')
     plt.xlabel('axis Kp')
     plt.ylabel('axis Ki')
     plt.title(f'Плоскость параметров настройки ПИД регулятора при С_2 = {C2}')
