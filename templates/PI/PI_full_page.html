@@ -33,7 +33,7 @@
                     <label class="form-label">k:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="k_value" value="22.9" required>
+                    <input type="text" class="form-control input-field-for-PID" name="k_value" style="width: 3.5rem;" value="22.9" required>
                 </div>
 
                 <div class="col-auto my-2">
@@ -50,8 +50,25 @@
                     <input type="text" class="form-control input-field-for-PID" name="stop_time" value="2000" required>
                 </div>
 
+                <hr class="my-4">
+
+                <div class="text-center mt-2">
+                    <h6>Что будет выведено:</h6>
+                    <ol class="list-unstyled">
+                        <li class="text-center">Построение передаточной фукнции объекта управления</li>
+                        <li class="text-center">Определение степени колебательности</li>
+                        <li class="text-center">Вычисление параметров регулятора</li>
+                        <li class="text-center">Построение графика D-разбиения параметров ПИ-регулятора</li>
+                        <li class="text-center">Построение передаточной функции объекта управления с использованием ПИ-регулятора</li>
+                        <li class="text-center">Определение степени затухания</li>
+                        <li class="text-center">Оценивание качества переходного процесса, степени затухания, длительности</li>
+                    </ol>
+                </div>
+
+                <hr class="my-4">
+
                 <div class="text-center mb-3 my-2">
-                    <input type="submit" class="btn btn-primary" value="Построить график">
+                    <input type="submit" class="btn btn-primary" value="Выполнить">
                 </div>
             </div>
         </form>
