@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Построение кривой равной степени колебательности{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Введите данные для построения кривой равной степени колебательности:</h2>
+    <form action="/constructing_a_curve_of_equal_degree_of_oscillation" method="POST">
+            <div class="row justify-content-center">
+                <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t1_value" value="38.3" style="width: 5rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="t2_value" value="648.89" style="width: 5rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Колебательность:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="m" value="0.3" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Запаздывание:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="first_x_value" value="10" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Коэффициент усиления:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="k" value="1.25" style="width: 4rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Stop time:</label>
+                    <input type="text" class="form-control input-field-for-PID" name="stop_time" value="600" style="width: 4rem;" required>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="text-center my-2">
+                    <input type="submit" class="btn btn-primary" value="Выполнить">
+                </div>
+            </div>
+        </form>
+
+    {% if image_equal_oscillation_curve_1 %}
+        <p class="text-center">Построим график зависимости C0(C1) и определяем из него C1 и C0 следующим образом:
+        находим на кривой точку максимума и выбираем точки правее него.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ image_equal_oscillation_curve_1 | safe }}
+        </div>
+
+            <div class="text-center">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Значение параметра настройки C1</th>
+                            <th>Значение параметра настройки C0</th>
+                            <th>Интегральный критерий качества I</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for c1, c0, i in results_1 %}
+                        <tr>
+                            <td>{{ "%.6f"|format(c1|float) }}</td>
+                            <td>{{ "%.6f"|format(c0|float) }}</td>
+                            <td>{{ "%.2f"|format(i|float) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        <p class="text-center">Как видно из таблицы, оптимальными настроечными параметрами регулятора будут
+            <b>C0 = {{ "%.6f"|format(min_c2_1|float) }}</b>, <b>C1 = {{ "%.6f"|format(min_c1_1|float) }}</b></p>
+    {% endif %}
+
+    {% if image_transient_process_control_1 %}
+        <p class="text-center">Переходныый процесс в одноконтурной системе с ПИ-регулятором по управляющему воздействию приведён на рисунке ниже.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ image_transient_process_control_1 | safe }}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

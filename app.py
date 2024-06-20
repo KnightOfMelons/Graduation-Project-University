@@ -1320,6 +1320,9 @@ def function_of_combined_system_first_page():
         first_x_value_1 = find_first_positive_value_in_list(x_values_1, y_values_1)
         first_x_value_2 = find_first_positive_value_in_list(x_values_2, y_values_2)
 
+        print(f'Первая. input_K_1={input_K_1},t2_1={t2_1},t1_1={t1_1},first_x_value_1={first_x_value_1}')
+        print(f'Вторая. input_K_2={input_K_2}, t2_2={t2_2},t1_2={t1_2}, first_x_value_2={first_x_value_2}')
+
         image_complex_control = plot_complex_frequency_response(input_K_1,
                                                                 t2_1,
                                                                 t1_1,
@@ -1425,5 +1428,123 @@ def function_of_combined_system_second_page():
                                image_transient_process_control_1=image_transient_process_control_1,)
 
     return render_template('Combined/combined_system_2.html')
+
+
+# ============ Отдельная страница для построения кривых разгона по каналам управления и возмущения =====
+@app.route('/plotting_acceleration_curves_by_channels', methods=['GET', 'POST'])
+def function_of_plotting_acceleration_curves_by_channels():
+    if request.method == 'POST':
+        x_values_1 = [float(request.form[f"xValues_{i}"]) for i in range(13)]
+        y_values_1 = [float(request.form[f"yValues_{i}"]) for i in range(13)]
+
+        # Сбор данных по каналу возмущения
+        x_values_2 = [float(request.form[f"xValues_2_{i}"]) for i in range(13)]
+        y_values_2 = [float(request.form[f"yValues_2_{i}"]) for i in range(13)]
+
+        acceleration_curve_control = acceleration_curve(x_values_1, y_values_1, 'Кривая разгона по каналу управления')
+        acceleration_curve_disturbance = acceleration_curve(x_values_2, y_values_2, 'Кривая разгона по каналу возмущения')
+
+        return render_template('Combined/Separate/plotting_acceleration_curves_by_channels.html',
+                               acceleration_curve_control=acceleration_curve_control,
+                               acceleration_curve_disturbance=acceleration_curve_disturbance,
+                               )
+
+    return render_template('Combined/Separate/plotting_acceleration_curves_by_channels.html')
+
+
+# ============ Отдельная страница для получения частотных характеристик =====
+@app.route('/frequency_characteristics', methods=['GET','POST'])
+def function_of_frequency_characteristics():
+    if request.method == 'POST':
+        input_K_1 = float(request.form['input_K_1'])
+        t2_1 = float(request.form['t2_1'])
+        t1_1 = float(request.form['t1_1'])
+        first_x_value_1 = float(request.form['first_x_value_1'])
+
+        input_K_2 = float(request.form['input_K_2'])
+        t2_2 = float(request.form['t2_2'])
+        t1_2 = float(request.form['t1_2'])
+        first_x_value_2 = float(request.form['first_x_value_2'])
+
+        image_complex_control = plot_complex_frequency_response(input_K_1,
+                                                                t2_1,
+                                                                t1_1,
+                                                                first_x_value_1,
+                                                                'управления.')
+        image_complex_disturbance = plot_complex_frequency_response(input_K_2,
+                                                                    t2_2,
+                                                                    t1_2,
+                                                                    first_x_value_2,
+                                                                    'возмущения.')
+
+        image_amplitude_control = plot_amplitude_frequency_response(input_K_1,
+                                                                    t2_1,
+                                                                    t1_1,
+                                                                    first_x_value_1,
+                                                                    'управления.')
+        image_amplitude_disturbance = plot_amplitude_frequency_response(input_K_2,
+                                                                        t2_2,
+                                                                        t1_2,
+                                                                        first_x_value_2,
+                                                                        'возмущения.')
+
+        image_phase_frequency_response_control = plot_phase_frequency_response(input_K_1,
+                                                                               t2_1,
+                                                                               t1_1,
+                                                                               first_x_value_1,
+                                                                               'управления.')
+        image_phase_frequency_response_disturbance = plot_phase_frequency_response(input_K_2,
+                                                                                   t2_2,
+                                                                                   t1_2,
+                                                                                   first_x_value_2,
+                                                                                   'возмущения.')
+
+        return render_template('Combined/Separate/frequency_characteristics.html',
+                               image_complex_control=image_complex_control,
+                               image_amplitude_control=image_amplitude_control,
+                               image_phase_frequency_response_control=image_phase_frequency_response_control,
+                               image_complex_disturbance=image_complex_disturbance,
+                               image_amplitude_disturbance=image_amplitude_disturbance,
+                               image_phase_frequency_response_disturbance=image_phase_frequency_response_disturbance,)
+
+    return render_template('Combined/Separate/frequency_characteristics.html')
+
+
+@app.route('/constructing_a_curve_of_equal_degree_of_oscillation', methods=['GET','POST'])
+def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
+    if request.method == 'POST':
+        k_1 = float(request.form['k'])
+        t1_1 = float(request.form['t1_value'])
+        t2_1 = float(request.form['t2_value'])
+        first_x_value_1 = float(request.form['first_x_value'])
+        stop_time = float(request.form['stop_time'])
+        m = float(request.form['m'])
+
+        image_equal_oscillation_curve_1, points_1 = plot_equal_degree_of_oscillation_curve(t2_1, t1_1, k_1,
+                                                                                           first_x_value_1, m)
+        results_1 = []
+        for C1, C2 in points_1:
+            display_value = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, C1, C2, stop_time,
+                                                                    constant_num=1,
+                                                                    plot_build=True)
+            results_1.append((C1, C2, display_value))
+        min_c1_1, min_c2_1, min_value_1 = find_min_integrated_response(results_1)
+        image_transient_process_control_1 = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, min_c1_1, min_c2_1,
+                                                                                    constant_num=20,
+                                                                                    plot_build=False,
+                                                                                    stop_time=600,
+                                                                                    delay_time=20,
+                                                                                    name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
+
+        return render_template('Combined/Separate/constructing_a_curve_of_equal_degree_of_oscillation.html',
+                               image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
+                               results_1=results_1,
+                               min_c1_1=min_c1_1,
+                               min_c2_1=min_c2_1,
+                               min_value_1=min_value_1,
+                               image_transient_process_control_1=image_transient_process_control_1,)
+
+    return render_template('Combined/Separate/constructing_a_curve_of_equal_degree_of_oscillation.html')
+
 
 app.run(debug=True)

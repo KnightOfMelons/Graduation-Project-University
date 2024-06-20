@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Получение частотных характеристик объекта по каналам{% endblock %}
+
+{% block content %}
+<div class="container">
+<form method="POST" action="/frequency_characteristics">
+            <div class="row justify-content-center">
+                <h4 class="text-center mb-4">Введите данные для канала управления:</h4>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t2_1" value="648.889" style="width: 5.5rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t1_1" value="38.3" style="width: 4rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Запаздывание:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="first_x_value_1" value="10.0" style="width: 4rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Коэффициент усиления:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="input_K_1" value="1.25" style="width: 4rem;" required>
+                </div>
+
+                <hr class="my-4">
+
+                <h4 class="text-center mb-4">Введите данные для канала возмущения:</h4>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T2:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t2_2" value="1521.913" style="width: 5.5rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">T1:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="t1_2" value="56.38" style="width: 4rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Запаздывание:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="first_x_value_2" value="30.0" style="width: 4rem;" required>
+                </div>
+
+                <div class="col-auto my-2">
+                    <label class="form-label">Коэффициент усиления:</label>
+                </div>
+                <div class="col-auto my-2">
+                    <input type="text" class="form-control input-field-for-PID" name="input_K_2" value="0.3" style="width: 4rem;" required>
+                </div>
+
+                <div class="text-center mb-3 my-2">
+                    <input type="submit" class="btn btn-primary" value="Выполнить">
+                </div>
+            </div>
+        </form>
+
+
+    {% if image_complex_control %}
+        <h5 class="text-center mt-3">Частотные характеристики объекта управления.</h5>
+        <p class="text-center">Частотные характеристики объекта по каналу управления приведены на рисунках снизу.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ image_complex_control | safe }}
+        </div>
+    {% endif %}
+
+    {% if image_amplitude_control %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_amplitude_control | safe}}
+        </div>
+    {% endif %}
+
+    {% if image_phase_frequency_response_control %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_phase_frequency_response_control | safe}}
+        </div>
+    {% endif %}
+
+    {% if image_complex_disturbance %}
+        <p class="text-center">Частотные характеристики объекта по каналу возмущения приведены на рисунках снизу.</p>
+
+        <div class="d-flex justify-content-center my-4">
+            {{ image_complex_disturbance | safe }}
+        </div>
+    {% endif %}
+
+    {% if image_amplitude_disturbance %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_amplitude_disturbance | safe}}
+        </div>
+    {% endif %}
+
+    {% if image_phase_frequency_response_disturbance %}
+        <div class="d-flex justify-content-center my-4">
+            {{ image_phase_frequency_response_disturbance | safe}}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
