@@ -745,6 +745,7 @@ def plot_phase_frequency_response(k, t2, t1, first_x_value, name_complex):
     ax.plot(w, phase)
     ax.set_title(f'Фазо-частотная характеристика по каналу {name_complex}')
     ax.grid(True)
+    ax.legend()
 
     # Сохраняем график в буфер
     buf = io.BytesIO()
@@ -863,7 +864,6 @@ def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time,
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
         buf.seek(0)
-        plt.close(fig)
 
         # Кодируем буфер в base64 строку
         image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
@@ -1029,12 +1029,6 @@ def function_of_main_pid_third():
 
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
-
-        print(f"T1 = {T1}, T2 = {T2}, K = {K},"
-              f" min_C0 = {min_C0},"
-              f" min_C1 =  {min_C1},"
-              f" min_C2 = {min_C2},"
-              f"t = {t}, y = {y}")
 
         return render_template("PID/PID_full_page_3.html",
                                first_image=first_image,
