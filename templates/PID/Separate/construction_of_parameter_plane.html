@@ -116,6 +116,15 @@
             </table>
             {{ third_image | safe }}
         </div>
+
+        <div class="text-center">
+            <p>Настройки регулятора примем:</p>
+            <p>C<sub>0</sub>=<b>{{ "%.6f"|format(min_C0|float) }}</b></p>
+            <p>C<sub>1</sub>=<b>{{ "%.6f"|format(min_C1|float) }}</b></p>
+            <p>C<sub>2</sub>=<b>{{ "%.6f"|format(min_C2|float) }}</b></p>
+
+            {{ min_integral_image | safe }}
+        </div>
     {% endif %}
     </div>
 {% endblock %}

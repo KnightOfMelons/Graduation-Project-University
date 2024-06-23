@@ -1120,6 +1120,13 @@ def function_of_construction_of_parameter_plane():
         coefficients_2 = [(C0_2[i], C1_2[i], integrals_2[i]) for i in range(len(C0_2))]
         coefficients_3 = [(C0_3[i], C1_3[i], integrals_3[i]) for i in range(len(C0_3))]
 
+        # Найти минимальный интеграл и соответствующие коэффициенты
+        all_integrals = integrals_1 + integrals_2 + integrals_3
+        all_coefficients = coefficients_1 + coefficients_2 + coefficients_3
+        min_integral_index = all_integrals.index(min(all_integrals, key=lambda x: float(x)))
+        min_C0, min_C1, _ = all_coefficients[min_integral_index]
+        min_C2 = [C2_1, C2_2, C2_3][min_integral_index // len(C0_1)]
+
         return render_template("PID/Separate/construction_of_parameter_plane.html",
                                first_image=first_image,
                                second_image=second_image,
@@ -1127,7 +1134,8 @@ def function_of_construction_of_parameter_plane():
                                coefficients_1=coefficients_1,
                                coefficients_2=coefficients_2,
                                coefficients_3=coefficients_3,
-                               C2_1=C2_1, C2_2=C2_2, C2_3=C2_3)
+                               C2_1=C2_1, C2_2=C2_2, C2_3=C2_3,
+                               min_C0=min_C0, min_C1=min_C1, min_C2=min_C2)
 
     return render_template("PID/Separate/construction_of_parameter_plane.html")
 
@@ -1268,16 +1276,19 @@ def function_of_equal_degree_of_vibration_curve():
         y_min = float(request.form['y_min'])
         y_max = float(request.form['y_max'])
 
-        image_D_graph, coefficients_with_integrals, _, _ = generate_system_response(k_value, T2_value, T1_value,
+        image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value,
                                                                                     x_min,
                                                                                     x_max,
                                                                                     y_min,
                                                                                     y_max
                                                                                     )
 
-        return render_template('PI/PI_full_page.html',
+
+        return render_template('PI/Separate/construction_of_parameter_planeequal_degree_of_vibration_curve.html',
                                image_D_graph=image_D_graph,
-                               coefficients_with_integrals=coefficients_with_integrals, )
+                               coefficients_with_integrals=coefficients_with_integrals,
+                               min_C0=min_C0,
+                               min_C1=min_C1)
 
     return render_template('PI/Separate/equal_degree_of_vibration_curve.html')
 

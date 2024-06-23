@@ -102,6 +102,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <p class="text-center">За оптимальные настройки регулятора примем:</p>
+            <p>C0 = <b>{{ "%.6f"|format(min_C0|float) }}</b><br>C1 = <b>{{ "%.6f"|format(min_C1|float) }}</b></p>
             {% endif %}
         </div>
     </div>
