@@ -56,49 +56,49 @@
                         <label class="form-label">θ:</label>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_0" value="0" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_0" value="0" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_1" value="1" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_1" value="1" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_2" value="3" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_2" value="3" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_3" value="8" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_3" value="8" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_4" value="18" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_4" value="18" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_5" value="30" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_5" value="30" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_6" value="44" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_6" value="44" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_7" value="59" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_7" value="59" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_8" value="73" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_8" value="73" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_9" value="85" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_9" value="85" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_10" value="95" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_10" value="95" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_11" value="101" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_11" value="101" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_12" value="104" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_12" value="104" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_13" value="105" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_13" value="105" required>
                     </div>
                     <div class="col-auto my-2">
-                        <input type="text" class="form-control input-field-for-PID-2" name="yValues_14" value="105" required>
+                        <input type="number" min="0" max="500" class="form-control input-field-for-PID" name="yValues_14" value="105" required>
                     </div>
                 </div>
 
@@ -226,4 +226,6 @@
             <a href="/PID_part_3"><button type="button" class="btn btn-primary">Следующая часть</button></a>
         </div>
     </div>
+
+<script src="{{ url_for('static', filename='js/checking_numbers_2.js') }}"></script>
 {% endblock %}

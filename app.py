@@ -1449,11 +1449,11 @@ def function_of_combined_system_second_page():
             results_1.append((C1, C2, display_value))
         min_c1_1, min_c2_1, min_value_1 = find_min_integrated_response(results_1)
         image_transient_process_control_1 = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, min_c1_1, min_c2_1,
-                                            constant_num=20,
-                                            plot_build=False,
-                                            stop_time=600,
-                                            delay_time=20,
-                                            name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
+                                                                                    constant_num=20,
+                                                                                    plot_build=False,
+                                                                                    stop_time=600,
+                                                                                    delay_time=20,
+                                                                                    name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
 
         return render_template('Combined/combined_system_2.html',
                                image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
@@ -1571,7 +1571,9 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
                                                                                     plot_build=False,
                                                                                     stop_time=600,
                                                                                     delay_time=20,
-                                                                                    name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
+                                                                                    name_plot='Переходный процесс в '
+                                                                                              'одноконтурной по '
+                                                                                              'управляющему возд-вию.')
 
         # Сохранение данных в базу данных
         new_entry = APIServiceAutomation(C0=min_c2_1, C1=min_c1_1)
