@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, render_template, jsonify
+from flask_sqlalchemy import SQLAlchemy
+# import psycopg2
+from config import DATABASE_URI
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -9,6 +12,23 @@ import control as ctl
 import math
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+
+class APIServiceAutomation(db.Model):
+    __tablename__ = 'api_service_automation'
+    id = db.Column(db.Integer, primary_key=True)
+    C0 = db.Column(db.Float, nullable=False)
+    C1 = db.Column(db.Float, nullable=False)
+    C2 = db.Column(db.Float, nullable=True)
+
+
+# Создание таблицы
+with app.app_context():
+    db.create_all()
 
 
 @app.route("/")
@@ -186,7 +206,7 @@ def compute_and_plot(T1, T2, K, C2):
     # Plot the results
     fig, ax = plt.subplots()
     ax.plot(Kp, Ki, label=f'C2 = {C2}')
-    ax.scatter(C0_values,C1_values, color='red', label='Выбранные точки')
+    ax.scatter(C0_values, C1_values, color='red', label='Выбранные точки')
     plt.xlabel('axis Kp')
     plt.ylabel('axis Ki')
     plt.title(f'Плоскость параметров настройки ПИД регулятора при С_2 = {C2}')
@@ -1127,6 +1147,11 @@ def function_of_construction_of_parameter_plane():
         min_C0, min_C1, _ = all_coefficients[min_integral_index]
         min_C2 = [C2_1, C2_2, C2_3][min_integral_index // len(C0_1)]
 
+        # Сохранение данных в базу данных
+        new_entry = APIServiceAutomation(C0=min_C0, C1=min_C1, C2=min_C2)
+        db.session.add(new_entry)
+        db.session.commit()
+
         return render_template("PID/Separate/construction_of_parameter_plane.html",
                                first_image=first_image,
                                second_image=second_image,
@@ -1276,15 +1301,20 @@ def function_of_equal_degree_of_vibration_curve():
         y_min = float(request.form['y_min'])
         y_max = float(request.form['y_max'])
 
-        image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value, T1_value,
-                                                                                    x_min,
-                                                                                    x_max,
-                                                                                    y_min,
-                                                                                    y_max
-                                                                                    )
+        image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value,
+                                                                                              T1_value,
+                                                                                              x_min,
+                                                                                              x_max,
+                                                                                              y_min,
+                                                                                              y_max
+                                                                                              )
 
+        # Сохранение данных в базу данных
+        new_entry = APIServiceAutomation(C0=min_C0, C1=min_C1)
+        db.session.add(new_entry)
+        db.session.commit()
 
-        return render_template('PI/Separate/construction_of_parameter_planeequal_degree_of_vibration_curve.html',
+        return render_template('PI/Separate/equal_degree_of_vibration_curve.html',
                                image_D_graph=image_D_graph,
                                coefficients_with_integrals=coefficients_with_integrals,
                                min_C0=min_C0,
@@ -1409,12 +1439,6 @@ def function_of_combined_system_second_page():
         stop_time = float(request.form['stop_time'])
         m = float(request.form['m'])
 
-        # Тут был код для реализации по возмущению, но не получается расчёт (график строится не так)
-        # k_2 = float(request.form['k_2'])
-        # t1_2 = float(request.form['t1_value_2'])
-        # t2_2 = float(request.form['t2_value_2'])
-        # first_x_value_2 = float(request.form['first_x_value_2'])
-
         image_equal_oscillation_curve_1, points_1 = plot_equal_degree_of_oscillation_curve(t2_1, t1_1, k_1,
                                                                                            first_x_value_1, m)
         results_1 = []
@@ -1425,26 +1449,11 @@ def function_of_combined_system_second_page():
             results_1.append((C1, C2, display_value))
         min_c1_1, min_c2_1, min_value_1 = find_min_integrated_response(results_1)
         image_transient_process_control_1 = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, min_c1_1, min_c2_1,
-                                                                                    constant_num=20,
-                                                                                    plot_build=False,
-                                                                                    stop_time=600,
-                                                                                    delay_time=20,
-                                                                                    name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
-
-        # image_equal_oscillation_curve_2, points_2 = plot_equal_degree_of_oscillation_curve(t2_2, t1_2, k_2, first_x_value_2, m)
-        # results_2 = []
-        # for C1, C2 in points_2:
-        #     display_value = plot_step_response_with_transport_delay(k_2, t2_2, t1_2, C1, C2, stop_time,
-        #                                                             constant_num=1,
-        #                                                             plot_build=True)
-        #     results_2.append((C1, C2, display_value))
-        # min_c1_2, min_c2_2, min_value_2 = find_min_integrated_response(results_2)
-        # image_transient_process_control_2 = plot_step_response_with_transport_delay(k_2, t2_2, t1_2, min_c1_2, min_c2_2,
-        #                                                                           constant_num=20,
-        #                                                                           plot_build=False,
-        #                                                                           stop_time=600,
-        #                                                                           delay_time=20,
-        #                                                                           name_plot='Переходный процесс в одноконтурной по возмущающему возд-вию.')
+                                            constant_num=20,
+                                            plot_build=False,
+                                            stop_time=600,
+                                            delay_time=20,
+                                            name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
 
         return render_template('Combined/combined_system_2.html',
                                image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
@@ -1564,6 +1573,11 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
                                                                                     delay_time=20,
                                                                                     name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
 
+        # Сохранение данных в базу данных
+        new_entry = APIServiceAutomation(C0=min_c2_1, C1=min_c1_1)
+        db.session.add(new_entry)
+        db.session.commit()
+
         return render_template('Combined/Separate/constructing_a_curve_of_equal_degree_of_oscillation.html',
                                image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
                                results_1=results_1,
@@ -1573,6 +1587,20 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
                                image_transient_process_control_1=image_transient_process_control_1, )
 
     return render_template('Combined/Separate/constructing_a_curve_of_equal_degree_of_oscillation.html')
+
+
+@app.route('/api/data', methods=['GET'])
+def get_data():
+    data = APIServiceAutomation.query.all()
+    result = []
+    for entry in data:
+        result.append({
+            'ID': entry.id,
+            'C0': entry.C0,
+            'C1': entry.C1,
+            'C2': entry.C2
+        })
+    return jsonify(result)
 
 
 app.run(debug=True)
