@@ -12,7 +12,7 @@
                     <label class="form-label">T2:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="1712.0" required>
+                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="1712.0" style="width: 5rem;" required>
                 </div>
 
                  <div class="col-auto my-2">
@@ -33,7 +33,7 @@
                     <label class="form-label">k:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="k_value" style="width: 3.5rem;" value="22.9" required>
+                    <input type="text" class="form-control input-field-for-PID" name="k_value" value="22.9" required>
                 </div>
 
                 <div class="col-auto my-2">
@@ -58,28 +58,28 @@
                     <label class="form-label">x мин.:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="x_min" value="0" style="width: 4rem;" required>
+                    <input type="text" class="form-control input-field-for-PID" name="x_min" value="0"  required>
                 </div>
 
                 <div class="col-auto my-2">
                     <label class="form-label">x макс.:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="x_max" value="0.2" style="width: 4rem;" required>
+                    <input type="text" class="form-control input-field-for-PID" name="x_max" value="0.2"  required>
                 </div>
 
                 <div class="col-auto my-2">
                     <label class="form-label">y мин.:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="y_min" value="0" style="width: 4rem;" required>
+                    <input type="text" class="form-control input-field-for-PID" name="y_min" value="0"  required>
                 </div>
 
                 <div class="col-auto my-2">
                     <label class="form-label">y макс.:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="y_max" value="0.002" style="width: 4rem;" required>
+                    <input type="text" class="form-control input-field-for-PID" name="y_max" value="0.002" required>
                 </div>
 
                 <hr class="my-4">
@@ -179,4 +179,6 @@
             {% endif %}
         </div>
     </div>
+
+<script src="{{ url_for('static', filename='js/checking_numbers_5.js') }}"></script>
 {% endblock %}

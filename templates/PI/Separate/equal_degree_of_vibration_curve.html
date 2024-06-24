@@ -12,7 +12,7 @@
                     <label class="form-label">T2:</label>
                 </div>
                 <div class="col-auto my-2">
-                    <input type="text" class="form-control input-field-for-PID" name="T2_value" value="1712.0" required>
+                    <input type="text" class="form-control input-field-for-PID" name="T2_value" style="width: 5rem;" value="1712.0" required>
                 </div>
 
                  <div class="col-auto my-2">
@@ -109,4 +109,6 @@
             {% endif %}
         </div>
     </div>
+
+<script src="{{ url_for('static', filename='js/checking_numbers_6.js') }}"></script>
 {% endblock %}
