@@ -18,6 +18,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
+# ============================== Создание базы данных и таблиц в ней =================================================
+# id - это просто идентификатор, который при каждой генерации будет увеличиваться на 1, C0, C1, C2 - это просто
+# значения ПИ-регулятора или ПИД-регулятора (C2 будет только в случае расчёта ПИД-регулятора, в любом другом
+# случае C2 будем иметь значение None).
 class APIServiceAutomation(db.Model):
     __tablename__ = 'api_service_automation'
     id = db.Column(db.Integer, primary_key=True)
@@ -31,11 +35,13 @@ with app.app_context():
     db.create_all()
 
 
+# =========================================== Обработка главной страницы ==============================================
 @app.route("/")
 def main_page():
     return render_template('index.html')
 
 
+# ======================== Обработка страницы с общими сведениями о котле КВГМ-100 ====================================
 @app.route('/kvgm100')
 def function_of_kvgm_info_page():
     return render_template('kvgm-100.html')
@@ -88,6 +94,7 @@ def transient_process_using_a_regulator(T1, T2, K, C0, C1, C2):
     return t, y, integral_formatted
 
 
+# Функция для вычисления интегралов в плоскости параметров одноконтурной АСР
 def calculate_integrals(T1, T2, K, C0_list, C1_list, C2):
     integrals = []
     for C0, C1 in zip(C0_list, C1_list):
@@ -96,6 +103,8 @@ def calculate_integrals(T1, T2, K, C0_list, C1_list, C2):
     return integrals
 
 
+# Построение прееходного процесса с использованием ПИД-регулятора, а также получения точек А1, А2, А3
+# для оценки переходного процесса
 def plot_system_response(t, y):
     # Create a new figure and axis
     fig, ax = plt.subplots()
@@ -173,6 +182,7 @@ def plot_system_response(t, y):
     return image_html, A6_value, A12_value, A7_value, t_p
 
 
+# Функция для построения плоскости параметров при введённом C2
 def compute_and_plot(T1, T2, K, C2):
     w = np.arange(0, 0.02, 0.0001)
     m = 0.3
@@ -444,6 +454,7 @@ def calculate_total_area(x_values, y_values):
     return total_area
 
 
+# Функция для нахождения первого положительного числа
 def find_first_positive_index(y_values, x_values):
     for index, value in enumerate(y_values):
         if value > 0:
@@ -684,6 +695,7 @@ def acceleration_curve(x_values, y_values, name):
     return image_impulse
 
 
+# Нахождение первого положительного значения в списке, а потом нахождения элемента на индексе -1 меньше, чем в прошлом
 def find_first_positive_value_in_list(x_values, y_values):
     for i in range(len(y_values)):
         if y_values[i] > 0:
@@ -785,6 +797,7 @@ def plot_phase_frequency_response(k, t2, t1, first_x_value, name_complex):
     return image_impulse
 
 
+# Функция для построения кривой равной степени колебательности
 def plot_equal_degree_of_oscillation_curve(T2, T1, k, first_x_value, m):
     # Создаем массив частот
     w = np.arange(0, 0.0601, 0.0001)
@@ -898,6 +911,7 @@ def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time,
         return image_html
 
 
+# Нахождение минимального I, а также сохранение C0 и C1 этого же I
 def find_min_integrated_response(results):
     # Поиск минимального значения интегратора
     min_value = float('inf')
@@ -974,7 +988,7 @@ def function_of_main_pid_page_first():
 @app.route("/PID_part_2", methods=["GET", "POST"])
 def function_of_main_pid_second():
     if request.method == "POST":
-        # ======================== Передаточные фукнции, определенные тремя методами ===================================
+        # ===== Беру значения с сайта =====
         t1_kos = int(request.form['t1_kos'])
         t2_kos = int(request.form['t2_kos'])
         t1_aldenb = int(request.form['t1_aldenb'])
@@ -985,6 +999,7 @@ def function_of_main_pid_second():
         stop_time = int(request.form['stop_time'])
         y_values = [float(request.form[f"yValues_{i}"]) for i in range(15)]
 
+        # ======================== Передаточные фукнции, определенные тремя методами =================================
         (image_three_methods,
          y1_values,
          y2_values,
@@ -1009,6 +1024,7 @@ def function_of_main_pid_second():
         y2_values = [round(y, 4) for y in y2_values]
         y3_values = [round(y, 4) for y in y3_values]
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('PID/PID_full_page_2.html',
                                image_three_methods=image_three_methods,
                                y_values=[y1_values, y2_values, y3_values],
@@ -1022,6 +1038,7 @@ def function_of_main_pid_second():
 @app.route('/PID_part_3', methods=['GET', 'POST'])
 def function_of_main_pid_third():
     if request.method == 'POST':
+        # ===== Беру значения с сайта =====
         T1 = float(request.form['t1_1'])
         T2 = float(request.form['t2_2'])
         K = float(request.form['k'])
@@ -1029,32 +1046,38 @@ def function_of_main_pid_third():
         C2_2 = float(request.form['c2_2'])
         C2_3 = float(request.form['c2_3'])
 
+        # Построение плоскостей параметров при подобранном C2 (тут делается 3 штуки, посему имеем C2_1, C2_2, C2_3)
         first_image, C0_1, C1_1 = compute_and_plot(T1, T2, K, C2_1)
         second_image, C0_2, C1_2 = compute_and_plot(T1, T2, K, C2_2)
         third_image, C0_3, C1_3 = compute_and_plot(T1, T2, K, C2_3)
 
+        # Вычисляем интегралы по точкам C0, C1 и C2. C0_1, C0_2 и C1_1, C1_2
+        # тут - списки (массивы). integrals тоже списки
         integrals_1 = calculate_integrals(T1, T2, K, C0_1, C1_1, C2_1)
         integrals_2 = calculate_integrals(T1, T2, K, C0_2, C1_2, C2_2)
         integrals_3 = calculate_integrals(T1, T2, K, C0_3, C1_3, C2_3)
 
+        # Составляю коэффициенты, то есть объединяю каждый C0, C1 и I в свою группу
         coefficients_1 = [(C0_1[i], C1_1[i], integrals_1[i]) for i in range(len(C0_1))]
         coefficients_2 = [(C0_2[i], C1_2[i], integrals_2[i]) for i in range(len(C0_2))]
         coefficients_3 = [(C0_3[i], C1_3[i], integrals_3[i]) for i in range(len(C0_3))]
 
-        # Найти минимальный интеграл и соответствующие коэффициенты
+        # Находим наименьший интеграл, а затем запоминаем его C0, C1, C2
         all_integrals = integrals_1 + integrals_2 + integrals_3
         all_coefficients = coefficients_1 + coefficients_2 + coefficients_3
         min_integral_index = all_integrals.index(min(all_integrals, key=lambda x: float(x)))
         min_C0, min_C1, _ = all_coefficients[min_integral_index]
         min_C2 = [C2_1, C2_2, C2_3][min_integral_index // len(C0_1)]
 
-        # Построить график для минимального интеграла
+        # Построить график для минимального интеграла как раз по сохраненным ранее C0, C1, C2
         t, y, _ = transient_process_using_a_regulator(T1, T2, K, min_C0, min_C1, min_C2)
         min_integral_image, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
 
+        # Оценка переходного процесса
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template("PID/PID_full_page_3.html",
                                first_image=first_image,
                                second_image=second_image,
@@ -1114,6 +1137,9 @@ def function_of_pulse_and_acceleration_characteristics():
 # =============== Отдельная страница для переходной характеристики трёх моделей ========================
 @app.route('/step_response_of_three_models', methods=['GET', 'POST'])
 def function_of_step_response_of_three_models():
+    # Тут при заходе на страницу пользователь заметит текст о том, что он будет перенаправлен на основную страницу
+    # расчёта одноконтурной АСР, где конкретно происходит расчёт переходной характеристики трёх моделей.
+    # Сделано в угоду оптимизации кода и снижения нагрузки на сервер.
     return render_template("PID/Separate/step_response_of_three_models.html")
 
 
@@ -1121,6 +1147,7 @@ def function_of_step_response_of_three_models():
 @app.route('/construction_of_parameter_plane', methods=['GET', 'POST'])
 def function_of_construction_of_parameter_plane():
     if request.method == 'POST':
+        # ===== Беру значения с сайта =====
         T1 = float(request.form['t1_1'])
         T2 = float(request.form['t2_2'])
         K = float(request.form['k'])
@@ -1128,30 +1155,34 @@ def function_of_construction_of_parameter_plane():
         C2_2 = float(request.form['c2_2'])
         C2_3 = float(request.form['c2_3'])
 
+        # Строю плоскость параметров и вычисляю C0 и C1
         first_image, C0_1, C1_1 = compute_and_plot(T1, T2, K, C2_1)
         second_image, C0_2, C1_2 = compute_and_plot(T1, T2, K, C2_2)
         third_image, C0_3, C1_3 = compute_and_plot(T1, T2, K, C2_3)
 
+        # Вычисляю I по найденным C0 и C1
         integrals_1 = calculate_integrals(T1, T2, K, C0_1, C1_1, C2_1)
         integrals_2 = calculate_integrals(T1, T2, K, C0_2, C1_2, C2_2)
         integrals_3 = calculate_integrals(T1, T2, K, C0_3, C1_3, C2_3)
 
+        # Составляю коэффициенты, то есть объединяю каждый C0, C1 и I в свою группу
         coefficients_1 = [(C0_1[i], C1_1[i], integrals_1[i]) for i in range(len(C0_1))]
         coefficients_2 = [(C0_2[i], C1_2[i], integrals_2[i]) for i in range(len(C0_2))]
         coefficients_3 = [(C0_3[i], C1_3[i], integrals_3[i]) for i in range(len(C0_3))]
 
-        # Найти минимальный интеграл и соответствующие коэффициенты
+        # Находим наименьший интеграл, а затем запоминаем его C0, C1, C2
         all_integrals = integrals_1 + integrals_2 + integrals_3
         all_coefficients = coefficients_1 + coefficients_2 + coefficients_3
         min_integral_index = all_integrals.index(min(all_integrals, key=lambda x: float(x)))
         min_C0, min_C1, _ = all_coefficients[min_integral_index]
         min_C2 = [C2_1, C2_2, C2_3][min_integral_index // len(C0_1)]
 
-        # Сохранение данных в базу данных
+        # Сохранение данных (наилучшие настройки регулятора) в базу данных
         new_entry = APIServiceAutomation(C0=min_C0, C1=min_C1, C2=min_C2)
         db.session.add(new_entry)
         db.session.commit()
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template("PID/Separate/construction_of_parameter_plane.html",
                                first_image=first_image,
                                second_image=second_image,
@@ -1168,8 +1199,8 @@ def function_of_construction_of_parameter_plane():
 # ================ Отдельная страница для наиболее идентичного переходного процесса =====================
 @app.route('/most_identical_transient_process', methods=['GET', 'POST'])
 def function_of_most_identical_transient_process():
-    # Переделать, не работает
     if request.method == 'POST':
+        # ===== Беру значения с сайта =====
         T1 = float(request.form['t1_1'])
         T2 = float(request.form['t2_2'])
         K = float(request.form['k'])
@@ -1179,11 +1210,14 @@ def function_of_most_identical_transient_process():
 
         # Построить график для минимального интеграла
         t, y, _ = transient_process_using_a_regulator(T1, T2, K, min_C0, min_C1, min_C2)
+        # Запоминаем точки с графика A1, A2, A3
         min_integral_image, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
 
+        # Используем сохранненные точки для оценки переходного процесса
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template("PID/Separate/most_identical_transient_process.html",
                                min_integral_image=min_integral_image,
                                min_C0=min_C0, min_C1=min_C1, min_C2=min_C2,
@@ -1200,14 +1234,18 @@ def function_of_most_identical_transient_process():
 @app.route('/SIMOU', methods=["GET", "POST"])
 def method_simou():
     if request.method == "POST":
+        # ===== Беру значения с сайта =====
         x_values = np.array([float(request.form[f"xValues_{i}"]) for i in range(14)])
         y_values = np.array([float(request.form[f"yValues_{i}"]) for i in range(14)])
         input_K = int(request.form['input_signal'])
 
+        # t1, t2 и t3 - это a[0]: 1, a[1]: 131.71, a[2]: 7436.27 и так далее. Как в ТАУ 2.0
+        # input_K - это коэффициент усиления.
         t1, t2, t3, input_K, extended_y, response_1st, response_2nd, response_3rd, image_simou = simou_method(y_values,
                                                                                                               x_values,
                                                                                                               input_K)
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('simou_methods.html',
                                image_simou=image_simou,
                                numbers=[round(t1, 2), round(t2, 2), round(t3, 2), round(input_K, 1)])
@@ -1221,6 +1259,7 @@ def method_simou():
 @app.route('/PI_first_page', methods=["GET", "POST"])
 def function_of_main_pi_page_first():
     if request.method == "POST":
+        # ===== Беру значения с сайта =====
         T2_value = float(request.form['T2_value'])
         T1_value = float(request.form['T1_value'])
         t_value = float(request.form['t_value'])
@@ -1233,9 +1272,12 @@ def function_of_main_pi_page_first():
         y_min = float(request.form['y_min'])
         y_max = float(request.form['y_max'])
 
+        # Определение степени колебательности
         m = -math.log(1 - y_value) / (2 * math.pi)
 
+        # Построение передаточной функции объекта управления
         image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
+        # Построение кривой равной степени колебательности, получение значений
         image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value,
                                                                                               T2_value,
                                                                                               T1_value,
@@ -1244,12 +1286,17 @@ def function_of_main_pi_page_first():
                                                                                               y_min,
                                                                                               y_max)
 
-        t, y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
+        # Вычисление интегралов по округленным до 6 чисел после запятой C0, C1
+        t, y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6),
+                                  round(min_C1, 6), False)
+        # Построение переходного процесса с использованием регулятора, а также нахождения точек A1, A2, A3 на нём
         image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
 
+        # Оцениваение качества переходного процесса
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('PI/PI_full_page.html',
                                image_transmission_funct=image_transmission_funct,
                                y_value=y_value,
@@ -1270,16 +1317,20 @@ def function_of_main_pi_page_first():
 @app.route('/transfer_function_of_the_object', methods=['GET', 'POST'])
 def functuion_of_transfer_function_of_the_object():
     if request.method == "POST":
+        # ===== Беру значения с сайта =====
         T2_value = float(request.form['T2_value'])
         T1_value = float(request.form['T1_value'])
         t_value = float(request.form['t_value'])
         k_value = float(request.form['k_value'])
         y_value = float(request.form['y_value'])
         stop_time = int(request.form['stop_time'])
+        # Определение степени колебательности
         m = -math.log(1 - y_value) / (2 * math.pi)
 
+        # Построение передаточной функции объекта управления
         image_transmission_funct = transmission_function_for_math_model(k_value, T2_value, T1_value, stop_time)
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('PI/Separate/transfer_function_of_the_object.html',
                                image_transmission_funct=image_transmission_funct,
                                y_value=y_value,
@@ -1292,6 +1343,7 @@ def functuion_of_transfer_function_of_the_object():
 @app.route('/equal_degree_of_vibration_curve', methods=['GET', 'POST'])
 def function_of_equal_degree_of_vibration_curve():
     if request.method == "POST":
+        # ===== Беру значения с сайта =====
         T2_value = float(request.form['T2_value'])
         T1_value = float(request.form['T1_value'])
         k_value = float(request.form['k_value'])
@@ -1301,6 +1353,7 @@ def function_of_equal_degree_of_vibration_curve():
         y_min = float(request.form['y_min'])
         y_max = float(request.form['y_max'])
 
+        # Построение кривой равной степени колебательности, получение значений
         image_D_graph, coefficients_with_integrals, min_C0, min_C1 = generate_system_response(k_value, T2_value,
                                                                                               T1_value,
                                                                                               x_min,
@@ -1309,11 +1362,12 @@ def function_of_equal_degree_of_vibration_curve():
                                                                                               y_max
                                                                                               )
 
-        # Сохранение данных в базу данных
+        # Сохранение данных (оптимальных настроек ПИ-регулятора, без C2. Он будет None на странце API) в базу данных
         new_entry = APIServiceAutomation(C0=min_C0, C1=min_C1)
         db.session.add(new_entry)
         db.session.commit()
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('PI/Separate/equal_degree_of_vibration_curve.html',
                                image_D_graph=image_D_graph,
                                coefficients_with_integrals=coefficients_with_integrals,
@@ -1327,18 +1381,23 @@ def function_of_equal_degree_of_vibration_curve():
 @app.route('/transient_process_using_a_PI_controller', methods=['GET', 'POST'])
 def function_of_transient_process_using_a_PI_controller():
     if request.method == "POST":
+        # ===== Беру значения с сайта =====
         T2_value = float(request.form['T2_value'])
         T1_value = float(request.form['T1_value'])
         k_value = float(request.form['k_value'])
         min_C0 = float(request.form['min_C0'])
         min_C1 = float(request.form['min_C1'])
 
+        # Вычисление интегралов по округленным до 6 чисел после запятой min_C0, min_C1
         t, y = calculate_integral(T1_value, T2_value, k_value, round(min_C0, 6), round(min_C1, 6), False)
+        # Построение переходного процесса с использованием регулятора, а также нахождения точек A1, A2, A3 на нём
         image_transmission_funct_PI_controller, A1_value, A2_value, A3_value, t_p = plot_system_response(t, y)
 
+        # Оценивание качества переходного процесса
         first_calculation = (A2_value / A1_value) * 100
         second_calculation = 1 - (A3_value / A1_value)
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('PI/Separate/transient_process_using_a_PI_controller.html',
                                min_C0=min_C0,
                                min_C1=min_C1,
@@ -1377,42 +1436,48 @@ def function_of_combined_system_first_page():
         t1_1, t2_1, t3_1, input_K_1, _, _, _, _, _ = simou_method(np.array(y_values_1), np.array(x_values_1), input_K)
         t1_2, t2_2, t3_2, input_K_2, _, _, _, _, _ = simou_method(np.array(y_values_2), np.array(x_values_2), input_K)
 
+        # Нахождение первого положительного значения в списке,
         first_x_value_1 = find_first_positive_value_in_list(x_values_1, y_values_1)
         first_x_value_2 = find_first_positive_value_in_list(x_values_2, y_values_2)
 
+        # Построение комплексной частотной характеристики по каналу управления
         image_complex_control = plot_complex_frequency_response(input_K_1,
                                                                 t2_1,
                                                                 t1_1,
                                                                 first_x_value_1,
                                                                 'управления.')
+        # Построение комплексной частотной характеристики по каналу возмущения
         image_complex_disturbance = plot_complex_frequency_response(input_K_2,
                                                                     t2_2,
                                                                     t1_2,
                                                                     first_x_value_2,
                                                                     'возмущения.')
-
+        # Построение амплитудно-частотной характеристики по каналу управления
         image_amplitude_control = plot_amplitude_frequency_response(input_K_1,
                                                                     t2_1,
                                                                     t1_1,
                                                                     first_x_value_1,
                                                                     'управления.')
+        # Построение амплитудно-частотной характеристики по каналу возмущения
         image_amplitude_disturbance = plot_amplitude_frequency_response(input_K_2,
                                                                         t2_2,
                                                                         t1_2,
                                                                         first_x_value_2,
                                                                         'возмущения.')
-
+        # Построение фазо-частотной характеристики по каналу управления
         image_phase_frequency_response_control = plot_phase_frequency_response(input_K_1,
                                                                                t2_1,
                                                                                t1_1,
                                                                                first_x_value_1,
                                                                                'управления.')
+        # Построение фазо-частотной характеристики по каналу возмущения
         image_phase_frequency_response_disturbance = plot_phase_frequency_response(input_K_2,
                                                                                    t2_2,
                                                                                    t1_2,
                                                                                    first_x_value_2,
                                                                                    'возмущения.')
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('Combined/combined_system_1.html',
                                acceleration_curve_control=acceleration_curve_control,
                                acceleration_curve_disturbance=acceleration_curve_disturbance,
@@ -1432,6 +1497,7 @@ def function_of_combined_system_first_page():
 @app.route('/combined_system_2', methods=['GET', 'POST'])
 def function_of_combined_system_second_page():
     if request.method == "POST":
+        # ===== Беру значения с сайта =====
         k_1 = float(request.form['k'])
         t1_1 = float(request.form['t1_value'])
         t2_1 = float(request.form['t2_value'])
@@ -1439,6 +1505,7 @@ def function_of_combined_system_second_page():
         stop_time = float(request.form['stop_time'])
         m = float(request.form['m'])
 
+        # Построение кривой равной степени колебательности
         image_equal_oscillation_curve_1, points_1 = plot_equal_degree_of_oscillation_curve(t2_1, t1_1, k_1,
                                                                                            first_x_value_1, m)
         results_1 = []
@@ -1447,7 +1514,10 @@ def function_of_combined_system_second_page():
                                                                     constant_num=1,
                                                                     plot_build=True)
             results_1.append((C1, C2, display_value))
+        # Нахождение оптимально настроечных параметров регулятора
         min_c1_1, min_c2_1, min_value_1 = find_min_integrated_response(results_1)
+
+        # Построение переходного процесса по управляющему воздействию
         image_transient_process_control_1 = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, min_c1_1, min_c2_1,
                                                                                     constant_num=20,
                                                                                     plot_build=False,
@@ -1455,6 +1525,7 @@ def function_of_combined_system_second_page():
                                                                                     delay_time=20,
                                                                                     name_plot='Переходный процесс в одноконтурной по управляющему возд-вию.')
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ =================================================
         return render_template('Combined/combined_system_2.html',
                                image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
                                results_1=results_1,
@@ -1470,6 +1541,7 @@ def function_of_combined_system_second_page():
 @app.route('/plotting_acceleration_curves_by_channels', methods=['GET', 'POST'])
 def function_of_plotting_acceleration_curves_by_channels():
     if request.method == 'POST':
+        # Сбор данных по каналу управления
         x_values_1 = [float(request.form[f"xValues_{i}"]) for i in range(13)]
         y_values_1 = [float(request.form[f"yValues_{i}"]) for i in range(13)]
 
@@ -1477,10 +1549,12 @@ def function_of_plotting_acceleration_curves_by_channels():
         x_values_2 = [float(request.form[f"xValues_2_{i}"]) for i in range(13)]
         y_values_2 = [float(request.form[f"yValues_2_{i}"]) for i in range(13)]
 
+        # Построение кривых по каналу правления и возмущения
         acceleration_curve_control = acceleration_curve(x_values_1, y_values_1, 'Кривая разгона по каналу управления')
         acceleration_curve_disturbance = acceleration_curve(x_values_2, y_values_2,
                                                             'Кривая разгона по каналу возмущения')
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ =================================================
         return render_template('Combined/Separate/plotting_acceleration_curves_by_channels.html',
                                acceleration_curve_control=acceleration_curve_control,
                                acceleration_curve_disturbance=acceleration_curve_disturbance,
@@ -1493,49 +1567,56 @@ def function_of_plotting_acceleration_curves_by_channels():
 @app.route('/frequency_characteristics', methods=['GET', 'POST'])
 def function_of_frequency_characteristics():
     if request.method == 'POST':
+        # Сбор данных по каналу управления
         input_K_1 = float(request.form['input_K_1'])
         t2_1 = float(request.form['t2_1'])
         t1_1 = float(request.form['t1_1'])
         first_x_value_1 = float(request.form['first_x_value_1'])
 
+        # Сбор данных по каналу возмущения
         input_K_2 = float(request.form['input_K_2'])
         t2_2 = float(request.form['t2_2'])
         t1_2 = float(request.form['t1_2'])
         first_x_value_2 = float(request.form['first_x_value_2'])
 
+        # Построение комплексно-частотных характеристика по каналу управления
         image_complex_control = plot_complex_frequency_response(input_K_1,
                                                                 t2_1,
                                                                 t1_1,
                                                                 first_x_value_1,
                                                                 'управления.')
+        # Построение комплексно-частотных характеристика по каналу возмущения
         image_complex_disturbance = plot_complex_frequency_response(input_K_2,
                                                                     t2_2,
                                                                     t1_2,
                                                                     first_x_value_2,
                                                                     'возмущения.')
-
+        # Построение амлитудно-частотной характеристики по каналу управления
         image_amplitude_control = plot_amplitude_frequency_response(input_K_1,
                                                                     t2_1,
                                                                     t1_1,
                                                                     first_x_value_1,
                                                                     'управления.')
+        # Построение амлитудно-частотной характеристики по каналу возмущения
         image_amplitude_disturbance = plot_amplitude_frequency_response(input_K_2,
                                                                         t2_2,
                                                                         t1_2,
                                                                         first_x_value_2,
                                                                         'возмущения.')
-
+        # Построение фазо-частотной характеристики по каналу управления
         image_phase_frequency_response_control = plot_phase_frequency_response(input_K_1,
                                                                                t2_1,
                                                                                t1_1,
                                                                                first_x_value_1,
                                                                                'управления.')
+        # Построение фазо-частотной характеристики по каналу возмущения
         image_phase_frequency_response_disturbance = plot_phase_frequency_response(input_K_2,
                                                                                    t2_2,
                                                                                    t1_2,
                                                                                    first_x_value_2,
                                                                                    'возмущения.')
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('Combined/Separate/frequency_characteristics.html',
                                image_complex_control=image_complex_control,
                                image_amplitude_control=image_amplitude_control,
@@ -1550,6 +1631,7 @@ def function_of_frequency_characteristics():
 @app.route('/constructing_a_curve_of_equal_degree_of_oscillation', methods=['GET', 'POST'])
 def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
     if request.method == 'POST':
+        # Ввод данных для построения кривой равной степени колебательности
         k_1 = float(request.form['k'])
         t1_1 = float(request.form['t1_value'])
         t2_1 = float(request.form['t2_value'])
@@ -1557,6 +1639,7 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
         stop_time = float(request.form['stop_time'])
         m = float(request.form['m'])
 
+        # Построение кривой равной степени колебательности
         image_equal_oscillation_curve_1, points_1 = plot_equal_degree_of_oscillation_curve(t2_1, t1_1, k_1,
                                                                                            first_x_value_1, m)
         results_1 = []
@@ -1565,7 +1648,11 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
                                                                     constant_num=1,
                                                                     plot_build=True)
             results_1.append((C1, C2, display_value))
+
+        # Нахождение оптимальных настроек регулятора
         min_c1_1, min_c2_1, min_value_1 = find_min_integrated_response(results_1)
+
+        # Построение переходного процесса по управляющему воздействию
         image_transient_process_control_1 = plot_step_response_with_transport_delay(k_1, t2_1, t1_1, min_c1_1, min_c2_1,
                                                                                     constant_num=20,
                                                                                     plot_build=False,
@@ -1575,11 +1662,12 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
                                                                                               'одноконтурной по '
                                                                                               'управляющему возд-вию.')
 
-        # Сохранение данных в базу данных
+        # Сохранение данных (параметров ПИ-регулятора, то есть C0 и C1) в базу данных
         new_entry = APIServiceAutomation(C0=min_c2_1, C1=min_c1_1)
         db.session.add(new_entry)
         db.session.commit()
 
+        # ======================================= ОБЩИЙ ВЫВОД НА САЙТ ================================================
         return render_template('Combined/Separate/constructing_a_curve_of_equal_degree_of_oscillation.html',
                                image_equal_oscillation_curve_1=image_equal_oscillation_curve_1,
                                results_1=results_1,
@@ -1591,9 +1679,10 @@ def function_of_constructing_a_curve_of_equal_degree_of_oscillation():
     return render_template('Combined/Separate/constructing_a_curve_of_equal_degree_of_oscillation.html')
 
 
+# ===================================== Обработка страницы со всеми API ============================================
 @app.route('/api/data', methods=['GET'])
 def get_data():
-    data = APIServiceAutomation.query.all()
+    data = APIServiceAutomation.query.order_by(APIServiceAutomation.id.desc()).all()
     result = []
     for entry in data:
         result.append({
@@ -1605,4 +1694,5 @@ def get_data():
     return jsonify(result)
 
 
+# Запуск приложения
 app.run(debug=True)
