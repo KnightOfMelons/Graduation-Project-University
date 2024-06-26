@@ -15,7 +15,7 @@ pip install -r requirements.txt
 Затем нужно создать базу данных PostgreSQL (можно через тот же pgAdmin, я так и делал), у меня это была api_service_automation. 
 Затем создать файл config.py со следующим значением внутри:
 ```
-DATABASE_URI = 'postgresql://postgres:ВАШПАРОЛЬ!АДРЕСБАЗЫДАННЫХ:ПОРТ/api_service_automation'
+DATABASE_URI = 'postgresql://postgres:ВАШПАРОЛЬ@АДРЕСБАЗЫДАННЫХ:ПОРТ/api_service_automation'
 ```
 
 После этого можно запускать веб-приложение, доступно по такому адресу локальному (http://127.0.0.1:5000/)
