@@ -1,0 +1,1 @@
+DATABASE_URI = 'postgresql://postgres:password@db:5432/api_service_automation'
