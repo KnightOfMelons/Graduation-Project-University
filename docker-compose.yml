@@ -1,0 +1,66 @@
+version: '3.3'
+networks:
+  backend:
+    #name: app
+    driver: bridge
+volumes:
+  postgres_data:
+    driver: local
+# Define services
+services:
+  # App backend service
+  app:
+    build:
+      context: ../../PycharmProjects/Graduation-Project-University
+      dockerfile: Dockerfile
+
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    restart: unless-stopped
+
+    # Give the container the name web-app. You can changes to something else.
+    container_name: back-tt3d
+
+    # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    ports:
+      - "80:8080"
+
+    networks:
+      - backend
+    # This service depends on postgres. Start that first.
+    depends_on:
+      - db
+
+  # Database Service (Postgres)
+  db:
+    # Use the Docker Image postgres. This will pull the 12 version.
+    image: postgres:15-alpine3.18
+
+    # Give the container the name postgres-db. You can changes to something else.
+    container_name: postgres-db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    restart: unless-stopped
+    # Set a volume some that database is not lost after shutting down the container.
+    # I used the name postgres-data but you can changed it to something else.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    # Maps port 5432 (localhost) to port 5432 on the container. You can change the ports to fix your needs.
+    ports:
+      - "5432:5432"
+    # Setup the username, password, and database name. You can changes these values.
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: api_service_automation
+      PGDATA: /var/lib/postgresql/data/pgdata
