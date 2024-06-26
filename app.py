@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from waitress import serve
 import psycopg2
 from config import DATABASE_URI
+import matplotlib
+matplotlib.use('Agg')  # Отключаем интерактивный режим
 import matplotlib.pyplot as plt
 import io
 import base64
@@ -179,6 +181,8 @@ def plot_system_response(t, y):
     # Generate HTML code to display the image
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+    plt.close()
+
     # Return the HTML code and data
     return image_html, A6_value, A12_value, A7_value, t_p
 
@@ -234,6 +238,8 @@ def compute_and_plot(T1, T2, K, C2):
 
     # Generate HTML code to display the image
     image_result = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return image_result, C0_values, C1_values
 
@@ -327,6 +333,8 @@ def transfer_functions_determined_by_three_methods(t1_kos=40,
     # Генерируем HTML-код для отображения картинки
     image_result = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+    plt.close()
+
     return (image_result, y1_values, y2_values, y3_values, dispersion_y1, dispersion_y2, dispersion_y3,
             chosen_answer,
             nums_for_answer)
@@ -378,7 +386,7 @@ def simou_method(y, t, input_K=1):
     _, response_3rd = step(system_3rd, T=time_points)
 
     # Создаем график
-    plt.figure(figsize=(8, 4))
+    plt.figure(figsize=(6, 4))
     plt.plot(np.linspace(0, 260, 500), extended_y, 'r', label='Исходная кривая')
     plt.plot(np.linspace(0, 260, 500), response_1st, 'g--', label='Симою 1го порядка')
     plt.plot(np.linspace(0, 260, 500), response_2nd, 'b--', label='Симою 2го порядка')
@@ -404,6 +412,8 @@ def simou_method(y, t, input_K=1):
 
     # Генерируем HTML-код для отображения картинки
     image_simou = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return t1, t2, t3, input_K, extended_y, response_1st, response_2nd, response_3rd, image_simou
 
@@ -436,6 +446,8 @@ def acceleration_characteristic(x_values, y_values):
 
     # Генерируем HTML-код для отображения картинки
     image_acceleration_charact = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     # Возвращаем HTML-код и данные
     return image_acceleration_charact, z_values
@@ -486,6 +498,8 @@ def impulse_transient_plot(x_values, y_values):
     # Генерируем HTML-код для отображения картинки
     image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+    plt.close()
+
     return image_impulse
 
 
@@ -529,6 +543,8 @@ def transmission_function_for_math_model(k=22.9, T2=1712.0, T1=126.4, t_stop=200
 
     # Generate HTML code for displaying the image
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return image_html
 
@@ -600,6 +616,8 @@ def generate_system_response(k=22.9, T2=1712.0, T1=126.4,
     # Генерируем HTML-код для отображения картинки
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+    plt.close()
+
     return image_html, coefficients_with_integrals, min_C0, min_C1
 
 
@@ -668,6 +686,8 @@ def plot_response_pi_controller(t, y):
     # Генерируем HTML-код для отображения картинки
     image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+    plt.close()
+
     return image_html
 
 
@@ -692,6 +712,8 @@ def acceleration_curve(x_values, y_values, name):
 
     # Генерируем HTML-код для отображения картинки
     image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return image_impulse
 
@@ -731,6 +753,8 @@ def plot_complex_frequency_response(k, t2, t1, first_x_value, name_complex):
     # Генерируем HTML-код для отображения картинки
     image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
 
+    plt.close()
+
     return image_impulse
 
 
@@ -760,6 +784,8 @@ def plot_amplitude_frequency_response(k, t2, t1, first_x_value, name_complex):
 
     # Генерируем HTML-код для отображения картинки
     image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return image_impulse
 
@@ -794,6 +820,8 @@ def plot_phase_frequency_response(k, t2, t1, first_x_value, name_complex):
 
     # Генерируем HTML-код для отображения картинки
     image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return image_impulse
 
@@ -844,6 +872,8 @@ def plot_equal_degree_of_oscillation_curve(T2, T1, k, first_x_value, m):
 
     # Генерируем HTML-код для отображения картинки
     image_impulse = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+    plt.close()
 
     return image_impulse, points
 
@@ -908,6 +938,8 @@ def plot_step_response_with_transport_delay(k, t2, t1, C1, C2, stop_time,
 
         # Генерируем HTML-код для отображения картинки
         image_html = '<img src="data:image/png;base64,{}">'.format(image_base64)
+
+        plt.close()
 
         return image_html
 
