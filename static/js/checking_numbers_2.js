@@ -3,7 +3,7 @@ const inputNames = ['t1_kos', 't2_kos', 't1_aldenb', 't2_aldenb', 't1_simou', 't
 inputNames.forEach(name => {
     const input = document.querySelector(`input[name="${name}"]`);
     if (input) {
-        input.addEventListener('input', function(event) {
+        input.addEventListener('blur', function(event) {
             let value = parseFloat(this.value);
             if (isNaN(value)) {
                 this.value = ''; // Очищаем поле, если введенное значение не является числом
@@ -18,7 +18,7 @@ inputNames.forEach(name => {
 
 const stopTimeInput = document.querySelector('input[name="stop_time"]');
 if (stopTimeInput) {
-    stopTimeInput.addEventListener('input', function(event) {
+    stopTimeInput.addEventListener('blur', function(event) {
         let value = parseFloat(this.value);
         if (isNaN(value)) {
             this.value = ''; // Очищаем поле, если введенное значение не является числом

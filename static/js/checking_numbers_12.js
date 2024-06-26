@@ -3,7 +3,7 @@ const inputNames = ['t2_1', 't1_1', 'first_x_value_1', 'input_K_1', 't2_2', 't1_
 inputNames.forEach(name => {
     const input = document.querySelector(`input[name="${name}"]`);
     if (input) {
-        input.addEventListener('input', function(event) {
+        input.addEventListener('blur', function(event) {
             let value = parseFloat(this.value);
             if (isNaN(value)) {
                 this.value = ''; // Очищаем поле, если введенное значение не является числом
