@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
-# import psycopg2
+from waitress import serve
+import psycopg2
 from config import DATABASE_URI
 import matplotlib.pyplot as plt
 import io
@@ -1693,6 +1694,5 @@ def get_data():
         })
     return jsonify(result)
 
-
-# Запуск приложения
-app.run(debug=True)
+if __name__ == '__main__':
+    serve(app, host='0.0.0.0', port=5000, threads=1)

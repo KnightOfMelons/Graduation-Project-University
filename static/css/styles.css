@@ -9,3 +9,9 @@
 .input-field-for-PID-2 {
     width: 3.12rem;
 }
+
+@media (max-width: 576px) {
+    .custom-mt-2 {
+        margin-top: 0.5rem !important;
+    }
+}
